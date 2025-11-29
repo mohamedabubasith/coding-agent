@@ -3,7 +3,7 @@
 import os
 from dotenv import load_dotenv
 
-from coding_agent_plugin.services.llm_service import LLMService
+
 
 _ = load_dotenv()
 

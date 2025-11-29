@@ -12,7 +12,7 @@ class BaseAgent(ABC):
         self.openapi_instance = openapi_instance
 
     @abstractmethod
-    async def execute(self, task: str) -> Dict[str, Any]:
+    async def execute(self, task: Any) -> Dict[str, Any]:
         """Execute the agent's task."""
         pass
 
