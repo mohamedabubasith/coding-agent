@@ -99,7 +99,7 @@ Should output: `Checking dist/*: PASSED`
 ### 3.1 Upload to Test PyPI
 
 ```bash
-twine upload --repository testpypi dist/*
+twine upload dist/*
 ```
 
 You'll be prompted for:

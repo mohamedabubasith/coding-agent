@@ -2,55 +2,40 @@
 
 ## 🚀 Real User Workflow
 
-### Step 1: Create a New Project
+### Step 1: Initialize Environment
 ```bash
-# Navigate to where you want to create projects
-cd /path/to/your/workspace
+agentic-coder init
+```
 
-# Create a new project
-python3 -m coding_agent_plugin.cli.main create "FastAPI login backend with JWT authentication"
+### Step 2: Create a New Project
+```bash
+# Create project structure
+agentic-coder project create "fastapi-login" --description "FastAPI with JWT"
+
+# Run the agent to build it
+agentic-coder project run "Build a FastAPI login backend with JWT authentication"
 ```
 
 **What Happens:**
-1. Plugin creates `projects/fastapi_login_backend_with_jwt_auth/` directory
-2. Planning agent creates a detailed plan
-3. If `--interactive` flag is used, you can review and approve the plan
-4. Files are generated:
-   ```
-   projects/fastapi_login_backend_with_jwt_auth/
-   ├── .agent_context/          # ← Hidden internal files
-   │   ├── planning.md          # Generated plan
-   │   ├── tasks.md            # Task tracking
-   │   ├── execution.md        # Execution logs
-   │   └── logs/               # Agent logs
-   │       ├── planning.log
-   │       ├── coding.log
-   │       └── execution.log
-   ├── .git/                    # Git repository (if --git)
-   ├── .gitignore              # Auto-generated
-   └── app/                    # ← Your actual project code
-       ├── main.py
-       ├── auth.py
-       ├── models.py
-       ├── database.py
-       └── requirements.txt
-   ```
+1. `project create` sets up the folder and database entry.
+2. `project run` starts the autonomous agent:
+   - Planning agent creates a detailed plan
+   - If `--interactive` flag is used, you can review and approve the plan
+   - Files are generated in `projects/fastapi-login/`
 
-### Step 2: Navigate to Your Project
+### Step 3: Navigate to Your Project
 ```bash
-cd projects/fastapi_login_backend_with_jwt_auth/
+agentic-coder project switch fastapi-login
+cd projects/fastapi-login/
 ```
 
-### Step 3: Make Improvements (Iterative Development)
+### Step 4: Make Improvements (Iterative Development)
 ```bash
-# Single improvement
-python3 -m coding_agent_plugin.cli.main improve "add email verification"
+# Major feature addition (Autonomous Mode)
+agentic-coder project run "Add email verification system"
 
-# Interactive mode (recommended)
-python3 -m coding_agent_plugin.cli.main improve --interactive
-
-# Target specific file
-python3 -m coding_agent_plugin.cli.main improve --file app/auth.py "add comprehensive docstrings"
+# Quick file modification (Direct Mode)
+agentic-coder improve "add docstrings to auth.py"
 ```
 
 **What Happens:**

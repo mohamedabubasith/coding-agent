@@ -23,6 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-language support
 - Cloud deployment integration
 
+## [0.3.22] - 2024-11-30
+
+### Added
+- **CLI Restructuring**: Introduced `agentic-coder init` and `agentic-coder project run` commands.
+- **Project-Centric Workflow**: Decoupled project creation from agent execution for better control.
+- **Environment Initialization**: `init` command now sets up the database and project directories.
+
 ## [0.3.21] - 2024-11-30
 
 ### Fixed

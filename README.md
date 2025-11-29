@@ -56,20 +56,31 @@ LLM_MODEL=gpt-4o                                # Default model
 
 ### Usage
 
-**Create a project:**
+**1. Initialize Environment:**
 ```bash
-agentic-coder create "FastAPI backend with JWT auth"
+agentic-coder init
 ```
 
-**Improve existing project:**
+**2. Create a Project:**
 ```bash
-cd projects/my_project/
-agentic-coder improve "add email verification"
+agentic-coder project create my-app
 ```
 
-**Interactive mode:**
+**3. Run the Agent:**
 ```bash
-agentic-coder improve --interactive
+agentic-coder project run "Build a FastAPI backend with JWT auth"
+```
+
+**4. Manage Projects:**
+```bash
+agentic-coder project list
+agentic-coder project switch my-app
+agentic-coder project info
+```
+
+**Quick Start (Legacy):**
+```bash
+agentic-coder create "FastAPI backend" --mode autonomous
 ```
 
 ## Examples
@@ -80,7 +91,7 @@ agentic-coder create "FastAPI backend with:
 - User authentication (JWT)
 - CRUD operations for todos
 - PostgreSQL database
-- Comprehensive tests" --interactive
+- Comprehensive tests" --mode autonomous
 ```
 
 ### Iteratively Improve
@@ -103,7 +114,8 @@ from coding_agent_plugin.agents import OrchestratorAgent, CodingAgent
 async def main():
     pm = ProjectManager()
     
-    # 1. Direct Mode (Single File)
+    # 1. Direct Mode (Single File Generation)
+    # Best for quick scripts or specific file creation
     project = pm.create_project("MyScript", "Simple Script")
     coder = CodingAgent()
     await coder.execute({
@@ -111,13 +123,14 @@ async def main():
         "project_id": project['id']
     })
     
-    # 2. Autonomous Mode (Full Project)
+    # 2. Autonomous Mode (Full Project Orchestration)
+    # Best for complex applications requiring planning and multiple files
     auto_project = pm.create_project("MyApp", "Complex App")
     orchestrator = OrchestratorAgent()
     await orchestrator.run_project(
         user_prompt="Build a calculator app with tests",
         project_id=auto_project['id']
-    )
+    })
 
 if __name__ == "__main__":
     asyncio.run(main())
@@ -154,7 +167,7 @@ LLM_MODEL=llama-3.3-70b-versatile
 
 ## Roadmap
 
-### Coming in v0.2.0
+### Upcoming Features
 - 🔌 **MCP Server Integration** - Connect custom tools and context
 - 📦 **Project Templates** - Pre-built templates (FastAPI, Next.js, React, etc.)
 - 📊 **Cost Tracking** - Monitor and control LLM costs
