@@ -73,7 +73,7 @@ pip install --upgrade build twine
 ### 2.2 Clean Previous Builds
 
 ```bash
-rm -rf dist/ build/ *.egg-info
+rm -rf dist/
 ```
 
 ### 2.3 Build Distribution Files

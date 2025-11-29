@@ -41,73 +41,103 @@ class OrchestratorAgent:
         
         # 1. Planning Phase
         print("📋 Phase 1: Planning")
-        planning_agent = self.agents["planning"]
-        plan_result = await planning_agent.execute({
-            "user_prompt": user_prompt, 
+        planning_task = {
+            "user_prompt": user_prompt,
             "project_id": project_id
-        })
-        workflow = plan_result["workflow"]
+        }
+        plan_result = await self.agents["planning"].execute(planning_task)
         
-        # Extract tasks from the plan (assuming new structured format)
-        # If workflow is just a list of dicts (old format), we might need to adapt.
-        # But we updated PlanningAgent to return a dict with "tasks" key.
-        # Wait, PlanningAgent.execute returns {"workflow": workflow}, where workflow is the return of plan().
-        # And plan() now returns a dict with "architecture" and "tasks".
-        
+        workflow = plan_result.get("workflow", {})
         tasks = workflow.get("tasks", [])
         
-        # 2. Execution Loop
+        if not tasks:
+            print("⚠️ No tasks generated in plan.")
+            return {"status": "failed", "error": "No tasks in plan"}
+
+        # Initialize tasks.md via TaskAgent
+        await self.agents["task"].execute({
+            "project_id": project_id,
+            "action": "init_tasks",
+            "tasks": tasks
+        })
+
         print(f"⚙️ Phase 2: Execution ({len(tasks)} tasks)")
         results = []
         MAX_RETRIES = 2
         
-        for task in tasks:
-            agent_name = task.get("agent")
+        from coding_agent_plugin.managers import ProjectManager
+        pm = ProjectManager()
+        project = pm.get_project(project_id)
+        if not project:
+            raise ValueError(f"Project '{project_id}' not found")
+            
+        project_path = project.storage_path
+        
+        for i, task in enumerate(tasks, 1):
             description = task.get("description")
-            details = task.get("details", {})
-            task_id = task.get("id", "unknown")
+            agent_type = task.get("agent", "coding")
             
-            print(f"  👉 Task {task_id}: {description} (Agent: {agent_name})")
+            print(f"  👉 Task {i}: {description} (Agent: {agent_type})")
             
-            if agent_name not in self.agents:
-                print(f"  ⚠️ Unknown agent: {agent_name}, skipping.")
-                continue
-                
-            agent = self.agents[agent_name]
-            
-            # Prepare task input
-            task_input = {
-                "user_prompt": details.get("prompt", description),
+            # Mark as in-progress
+            await self.agents["task"].execute({
                 "project_id": project_id,
-                **details # Merge other details like file_path, command, etc.
+                "action": "update_status",
+                "task_description": description,
+                "status": "in_progress"
+            })
+            
+            task_input = {
+                "user_prompt": description,
+                "project_id": project_id,
+                "project_path": project_path,
+                **task.get("details", {})
             }
             
-            # Execute with retry logic
             retry_count = 0
-            success = False
-            
-            while retry_count <= MAX_RETRIES and not success:
+            while retry_count <= MAX_RETRIES:
                 try:
-                    result = await agent.execute(task_input)
-                    results.append({"task": description, "status": "success", "result": result})
-                    print("     ✅ Success")
-                    success = True
+                    result = None
+                    if agent_type == "coding":
+                        result = await self.agents["coding"].execute(task_input)
+                    elif agent_type == "execution":
+                        result = await self.agents["execution"].execute(task_input)
+                    elif agent_type == "task":
+                        # TaskAgent is now mostly for tracking, but if plan assigns it work,
+                        # we treat it as a generic log or maybe file op if implemented.
+                        # For now, just log it.
+                        result = {"status": "completed", "message": "Task tracked"}
+                    else:
+                        print(f"     ⚠️ Unknown agent type: {agent_type}")
+                        result = {"status": "skipped"}
+                    
+                    results.append({"task": description, "status": "completed", "result": result})
+                    print(f"     ✅ Success")
+                    
+                    # Mark as completed
+                    await self.agents["task"].execute({
+                        "project_id": project_id,
+                        "action": "update_status",
+                        "task_description": description,
+                        "status": "completed"
+                    })
+                    break
                     
                 except Exception as e:
                     retry_count += 1
-                    print(f"     ❌ Failed (attempt {retry_count}): {e}")
+                    print(f"     ❌ Error: {e} (attempt {retry_count})")
                     
                     # Trigger ErrorAgent if this wasn't the ErrorAgent itself and we haven't exceeded retries
-                    if agent_name != "error" and retry_count <= MAX_RETRIES:
+                    if agent_type != "error" and retry_count < MAX_RETRIES: # Changed to < MAX_RETRIES to allow one more retry after error fix attempt
                         print(f"     🚑 Attempting recovery with ErrorAgent...")
                         
                         try:
                             error_agent = self.agents["error"]
                             error_task_input = {
-                                "user_prompt": f"Fix the following error in the code: {str(e)}",
+                                "error": str(e),
+                                "file_path": task_input.get("file_path"), # Might be None
                                 "project_id": project_id,
-                                "file_path": details.get("file_path", "generated_code.py"),
-                                "error_message": str(e)
+                                "project_path": project_path
                             }
                             
                             error_result = await error_agent.execute(error_task_input)

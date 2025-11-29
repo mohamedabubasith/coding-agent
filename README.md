@@ -24,29 +24,34 @@
 
 **Agentic Coder** creates complete, production-ready projects from natural language descriptions. It thinks, plans, codes, tests, and iteratively improves your projects.
 
-### Key Features
+## ✨ Features
 
-- 🎯 **Autonomous Project Creation** - Create complete projects from a single prompt
-- 🔄 **Iterative Improvement** - Continuously improve your project with natural language
-- 🎨 **Interactive Planning** - Review and approve plans before generation
-- 🔐 **Version Control** - Auto-initializes Git repository and commits changes
-- 🌐 **Multi-Provider Support** - Works with OpenAI, NVIDIA, Groq, and local models
+- **🤖 Two Powerful Modes**:
+    - **Direct Mode**: Quick, single-file code generation and modification.
+    - **Autonomous Mode**: Full project orchestration with planning, execution, and task tracking.
+- **🧠 Intelligent Planning**: Break down complex requirements into actionable steps.
+- **📋 Live Task Tracking**: Real-time progress updates via `tasks.md` checklist.
+- **💾 Organized Workspace**: Projects are stored cleanly with hidden artifacts (`.agentic/`) keeping your code clutter-free.
+- **🔌 Extensible**: Use as a CLI tool or import as a Python package.
+- **🛠️ Configurable**: Customize storage location, LLM providers, and more.
 
-## Quick Start
-
-### Installation
+## 🚀 Installation
 
 ```bash
 pip install agentic-coder
 ```
 
-### Configuration
+## ⚙️ Configuration
 
-Create a `.env` file:
+Create a `.env` file or set environment variables:
 
-```env
-LLM_API_KEY=your_api_key_here
-LLM_MODEL=gpt-4o
+```bash
+# Required
+OPENAI_API_KEY=sk-...
+
+# Optional
+AGENTIC_PROJECTS_DIR=~/.agentic-coder/projects  # Custom storage location
+LLM_MODEL=gpt-4o                                # Default model
 ```
 
 ### Usage
@@ -84,6 +89,38 @@ cd projects/my_app/
 agentic-coder improve "add rate limiting"
 agentic-coder improve "add logging"
 agentic-coder improve "optimize database queries"
+```
+
+### 📦 Python Package
+
+Integrate `agentic-coder` into your own tools:
+
+```python
+import asyncio
+from coding_agent_plugin.managers import ProjectManager
+from coding_agent_plugin.agents import OrchestratorAgent, CodingAgent
+
+async def main():
+    pm = ProjectManager()
+    
+    # 1. Direct Mode (Single File)
+    project = pm.create_project("MyScript", "Simple Script")
+    coder = CodingAgent()
+    await coder.execute({
+        "user_prompt": "Create hello.py",
+        "project_id": project['id']
+    })
+    
+    # 2. Autonomous Mode (Full Project)
+    auto_project = pm.create_project("MyApp", "Complex App")
+    orchestrator = OrchestratorAgent()
+    await orchestrator.run_project(
+        user_prompt="Build a calculator app with tests",
+        project_id=auto_project['id']
+    )
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 ## Supported LLM Providers

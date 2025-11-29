@@ -10,8 +10,10 @@ from .base_agent import BaseAgent
 class PlanningAgent(BaseAgent):
     """Agent responsible for task planning and workflow design."""
 
-    def __init__(self, name: str, openapi_instance: Any = None):
-        super().__init__(name, openapi_instance)
+    def __init__(self, name: str = "planning", model: str = None):
+        super().__init__(name, model)
+        from coding_agent_plugin.managers import ProjectManager
+        self.pm = ProjectManager()
         from coding_agent_plugin.core.config import LLM_MODEL, LLM_BASE_URL, LLM_API_KEY
         model_name = LLM_MODEL or "gpt-4o"
         
@@ -71,8 +73,8 @@ class PlanningAgent(BaseAgent):
         input_prompt = HumanMessage(content=f"Request: {user_input}")
         
         messages = [system_prompt, input_prompt]
-        
-        response = await self.model.ainvoke(messages)
+        # Call LLM with retry
+        response = await self.retry_operation(self.model.ainvoke, messages)
         content = response.content
         
         import json
@@ -100,32 +102,43 @@ class PlanningAgent(BaseAgent):
 
     def save_plan(self, project_id: str, workflow: Dict[str, Any]) -> None:
         """Save planning details to a file."""
-        import os
-        directory = f"projects/{project_id}/.agent_context"
-        os.makedirs(directory, exist_ok=True)
+        from pathlib import Path
         
-        file_path = os.path.join(directory, "planning.md")
+        # Resolve project path using ProjectManager
+        project = self.pm.get_project(project_id)
+        if not project:
+            self.log(f"Project {project_id} not found, cannot save plan")
+            return
+            
+        storage_path = Path(project.storage_path)
+        context_dir = storage_path / ".agentic"
+        context_dir.mkdir(parents=True, exist_ok=True)
         
-        with open(file_path, "w") as f:
-            f.write("# Project Plan\n\n")
-            
-            if "error" in workflow:
-                f.write("## ⚠️ Planning Error\n\n")
-                f.write(f"**Error**: {workflow['error']}\n\n")
-                f.write("### Raw LLM Output\n\n")
-                f.write("```\n")
-                f.write(workflow.get("raw_content", ""))
-                f.write("\n```\n")
-                return
-
-            f.write("## Architecture\n")
-            for component, files in workflow.get("architecture", {}).items():
-                f.write(f"- **{component}**\n")
-                for file in files:
-                    f.write(f"  - {file}\n")
-            
-            f.write("\n## Tasks\n")
-            for task in workflow.get("tasks", []):
-                f.write(f"- **{task['description']}** (Agent: {task['agent']})\n")
-                if "details" in task:
-                    f.write(f"  - Details: {task['details']}\n")
+        plan_path = context_dir / "planning.md"
+        self.log(f"Saving plan to: {plan_path}")
+        
+        try:
+            with open(plan_path, "w") as f:
+                f.write(f"# Implementation Plan\n\n")
+                
+                if "error" in workflow:
+                    f.write("## ⚠️ Planning Error\n\n")
+                    f.write(f"**Error**: {workflow['error']}\n\n")
+                    f.write("### Raw LLM Output\n\n")
+                    f.write("```\n")
+                    f.write(workflow.get("raw_content", ""))
+                    f.write("\n```\n")
+                else:
+                    f.write(f"## Architecture\n")
+                    arch = workflow.get("architecture", {})
+                    for component, files in arch.items():
+                        f.write(f"### {component}\n")
+                        for file in files:
+                            f.write(f"- {file}\n")
+                    
+                    f.write(f"\n## Tasks\n")
+                    for task in workflow.get("tasks", []):
+                        f.write(f"- [{task.get('phase')}] {task.get('description')} (Agent: {task.get('agent')})\n")
+            self.log(f"Plan saved successfully")
+        except Exception as e:
+            self.log(f"Failed to save plan: {e}")

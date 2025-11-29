@@ -1,6 +1,7 @@
 """Configuration - Load from .env file."""
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 
@@ -13,6 +14,13 @@ LLM_BASE_URL: str | None = os.getenv("LLM_BASE_URL")
 LLM_MODEL: str | None = os.getenv("LLM_MODEL")
 LLM_API_KEY: str | None = os.getenv("LLM_API_KEY")
 
+
+# Retry Configuration
+AGENT_MAX_RETRIES = int(os.getenv("AGENT_MAX_RETRIES", "3"))
+AGENT_RETRY_DELAY = int(os.getenv("AGENT_RETRY_DELAY", "2"))  # Seconds
+
+# Project Configuration
+AGENTIC_PROJECTS_DIR = os.getenv("AGENTIC_PROJECTS_DIR", str(Path.home() / ".agentic-coder" / "projects"))
 
 def validate_llm_config() -> None:
     """

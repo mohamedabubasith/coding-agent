@@ -13,9 +13,13 @@ class ProjectManager:
     
     def __init__(self):
         """Initialize project manager."""
+        from coding_agent_plugin.core.config import AGENTIC_PROJECTS_DIR
+        
         # Ensure database is initialized
         init_db()
-        self.projects_dir = AGENTIC_HOME / "projects"
+        
+        # Use configured projects directory
+        self.projects_dir = Path(AGENTIC_PROJECTS_DIR).resolve()
         self.projects_dir.mkdir(parents=True, exist_ok=True)
     
     def create_project(self, name: str, description: Optional[str] = None) -> Project:
@@ -32,37 +36,42 @@ class ProjectManager:
         Raises:
             ValueError: If project with name already exists
         """
-        # Sanitize project name for filesystem
-        safe_name = name.lower().replace(" ", "-").replace("_", "-")
-        storage_path = str(self.projects_dir / safe_name)
-        
         with get_db_session() as session:
             # Check if project already exists
             existing = session.query(Project).filter_by(name=name).first()
             if existing:
                 raise ValueError(f"Project '{name}' already exists")
             
-            # Create project directory
+            # Create project object first to generate ID
+            # We set a temporary storage path that we'll update immediately
+            project = Project(
+                name=name,
+                description=description,
+                storage_path="",  # Temporary
+                project_metadata={}
+            )
+            session.add(project)
+            session.flush()  # Generate ID
+            
+            # Now use the ID for the folder name
+            project_id = project.id
+            storage_path = str(self.projects_dir / project_id)
+            
+            # Create directory
             Path(storage_path).mkdir(parents=True, exist_ok=True)
             
             # Create .agentic metadata directory
             metadata_dir = Path(storage_path) / ".agentic"
             metadata_dir.mkdir(exist_ok=True)
             
-            # Create project in database
-            project = Project(
-                name=name,
-                description=description,
-                storage_path=storage_path,
-                project_metadata={}
-            )
-            session.add(project)
-            session.flush()  # Get the generated ID
+            # Update project with real path
+            project.storage_path = storage_path
+            
+            # Commit happens automatically on exit context if no error
             
             # Get project data before session closes
             project_dict = project.to_dict()
             
-        # Return project dict (session is closed)
         return project_dict
     
     def list_projects(self) -> List[Dict]:

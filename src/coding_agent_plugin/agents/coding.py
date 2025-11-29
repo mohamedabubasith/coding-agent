@@ -26,6 +26,8 @@ class CodingAgent(BaseAgent):
 
     async def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Execute the coding task."""
+        from coding_agent_plugin.managers import ProjectManager
+        
         user_prompt = task.get("user_prompt")
         project_id = task.get("project_id")
         file_path_relative = task.get("file_path") # Optional: specific file to write to
@@ -35,9 +37,17 @@ class CodingAgent(BaseAgent):
 
         self.log(f"Generating code for: {user_prompt}")
         
+        # Get project storage path
+        pm = ProjectManager()
+        project = pm.get_project(project_id)
+        if not project:
+            raise ValueError(f"Project '{project_id}' not found")
+            
+        project_path = project.storage_path
+        
         existing_content = None
         if file_path_relative:
-            full_path = os.path.join(f"projects/{project_id}", file_path_relative)
+            full_path = os.path.join(project_path, file_path_relative)
             if os.path.exists(full_path):
                 with open(full_path, "r") as f:
                     existing_content = f.read()
@@ -67,7 +77,7 @@ IMPORTANT RULES:
             HumanMessage(content=user_content)
         ]
         
-        response = await self.model.ainvoke(messages)
+        response = await self.retry_operation(self.model.ainvoke, messages)
         raw_content = response.content
         
         # Log the raw response for debugging
@@ -96,7 +106,16 @@ IMPORTANT RULES:
 
     def save_code(self, project_id: str, content: str, filename: str | None = None) -> str:
         """Save code to a file."""
-        directory = f"projects/{project_id}"
+        from coding_agent_plugin.managers import ProjectManager
+        pm = ProjectManager()
+        project = pm.get_project(project_id)
+        
+        if project:
+            directory = project.storage_path
+        else:
+            # Fallback for legacy/test
+            directory = os.path.abspath(f"projects/{project_id}")
+            
         os.makedirs(directory, exist_ok=True)
         
         if not filename:

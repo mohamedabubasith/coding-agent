@@ -23,6 +23,109 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-language support
 - Cloud deployment integration
 
+## [0.3.21] - 2024-11-30
+
+### Fixed
+- **PyPI Upload**: Bumped version to 0.3.21 to resolve potential version conflict.
+
+## [0.3.20] - 2024-11-30
+
+### Fixed
+- **PyPI Upload**: Bumped version to resolve TestPyPI upload conflict.
+
+## [0.3.19] - 2024-11-30
+
+### Added
+- **Task Tracking**: Upgraded `TaskAgent` to create and maintain a `tasks.md` checklist in the project's `.agentic` directory. The `Orchestrator` now updates this file in real-time (marking tasks as `[/]` in progress and `[x]` completed), providing a live progress log similar to the Antigravity workflow.
+
+## [0.3.18] - 2024-11-30
+
+### Fixed
+- **Artifact Generation**: Fixed `PlanningAgent` to correctly resolve the project path using `ProjectManager` when saving `planning.md`. This ensures artifacts are saved in the correct `.agentic` directory even when using custom project locations.
+
+## [0.3.17] - 2024-11-30
+
+### Fixed
+- **Indentation Error**: Fixed an `IndentationError` in `PlanningAgent` that caused the CLI to crash in autonomous mode.
+
+## [0.3.16] - 2024-11-30
+
+### Refactored
+- **Default Configuration**: Simplified `AGENTIC_PROJECTS_DIR` logic. It now defaults to `~/.agentic-coder/projects` directly in `config.py` if the environment variable is not set, ensuring a valid path is always available without complex fallback logic in `ProjectManager`.
+
+## [0.3.15] - 2024-11-30
+
+### Refactored
+- **Configuration**: Moved `AGENTIC_PROJECTS_DIR` handling to `core/config.py` to maintain clean code structure and centralization of configuration settings.
+
+## [0.3.14] - 2024-11-30
+
+### Added
+- **Configurable Project Location**: Added support for `AGENTIC_PROJECTS_DIR` environment variable. Users can now specify exactly where projects should be stored (e.g., `./projects` for local storage) instead of the default `~/.agentic-coder/projects`.
+
+## [0.3.13] - 2024-11-30
+
+### Changed
+- **Project ID Format**: Removed `proj_` prefix and truncation from Project ID generation. Now uses standard full UUID string (e.g., `550e8400-e29b-41d4-a716-446655440000`) for both database ID and folder name.
+
+## [0.3.12] - 2024-11-30
+
+### Fixed
+- **Planning Agent**: Updated system prompt to strictly define agent roles. `TaskAgent` is no longer assigned file creation tasks, preventing "Missing user_prompt" errors during autonomous execution.
+
+## [0.3.11] - 2024-11-30
+
+### Changed
+- **Project Folder Naming**: Changed project folder naming convention to use the database-generated **Project ID** (e.g., `proj_xyz123`) instead of the sanitized project name. This ensures guaranteed uniqueness and avoids any filesystem naming conflicts.
+
+## [0.3.10] - 2024-11-30
+
+### Added
+- **Retry Logic**: Added configurable retry logic for LLM calls with exponential backoff.
+  - `AGENT_MAX_RETRIES`: Configurable via env (default: 3).
+  - `AGENT_RETRY_DELAY`: Configurable via env (default: 2s).
+- **Robust Sanitization**: Enhanced project name sanitization to strictly allow only alphanumeric characters and hyphens, preventing filesystem issues.
+
+## [0.3.9] - 2024-11-30
+
+### Fixed
+- **File Saving**: Fixed `CodingAgent.save_code` still using hardcoded relative path. Now correctly uses `ProjectManager` to resolve the absolute storage path.
+
+## [0.3.8] - 2024-11-30
+
+### Fixed
+- **Execution Agent**: Fixed `object str can't be used in 'await' expression` by making `run_command` and `run_code` asynchronous and using `run_in_executor` to prevent blocking the event loop.
+
+## [0.3.7] - 2024-11-30
+
+### Fixed
+- **Orchestrator Import**: Fixed `NameError: name 'ProjectManager' is not defined` in `OrchestratorAgent` by adding missing import.
+
+## [0.3.6] - 2024-11-30
+
+### Fixed
+- **File Storage Paths**: Fixed critical issue where files were being written to relative `projects/` directory instead of the configured `~/.agentic-coder/projects/` directory. Updated `CodingAgent`, `OrchestratorAgent`, and `ExecutionAgent` to use absolute paths from `ProjectManager`.
+
+## [0.3.5] - 2024-11-30
+
+### Fixed
+- **Autonomous Mode Output**: Fixed `TypeError: 'Project' object is not subscriptable` in autonomous mode success message.
+
+## [0.3.4] - 2024-11-30
+
+### Fixed
+- **Autonomous Mode**: Fixed `TypeError: 'Project' object is not subscriptable` in autonomous mode by correctly accessing project attributes.
+
+## [0.3.3] - 2024-11-30
+
+### Fixed
+- **Direct Mode Output**: Fixed `TypeError: 'Project' object is not subscriptable` by correctly accessing project attributes in the success message.
+
+## [0.3.2] - 2024-11-30
+
+### Fixed
+- **Direct Mode Execution**: Fixed `ValueError: Missing user_prompt` by correctly passing `user_prompt` instead of `description` to `CodingAgent`.
+
 ## [0.3.1] - 2024-11-30
 
 ### Added

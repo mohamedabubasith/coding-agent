@@ -161,6 +161,29 @@ class BaseAgent(ABC):
         pass
 ```
 
+## 🏗️ Agent Architecture
+
+### Core Components
+
+- **`ProjectManager`**: Handles project creation, retrieval, and storage paths. Uses SQLite for metadata and filesystem for code.
+- **`OrchestratorAgent`**: The brain of Autonomous Mode. Coordinates other agents.
+- **`CodingAgent`**: The worker. Generates and modifies code. Used directly in Direct Mode.
+- **`PlanningAgent`**: Creates architectural plans and workflows (`planning.md`).
+- **`TaskAgent`**: Manages the project checklist (`tasks.md`), tracking progress in real-time.
+- **`ExecutionAgent`**: Runs shell commands and validates outputs.
+
+### Data Flow (Autonomous)
+
+1.  **User Request** -> `OrchestratorAgent`
+2.  `Orchestrator` -> `PlanningAgent` (Generates Plan)
+3.  `Orchestrator` -> `TaskAgent` (Initializes `tasks.md`)
+4.  **Loop**:
+    - `Orchestrator` picks next task.
+    - `TaskAgent` marks as In Progress.
+    - `Orchestrator` -> `CodingAgent` / `ExecutionAgent` (Do work).
+    - `TaskAgent` marks as Completed.
+5.  **Completion** -> User notified.
+
 ### 1. Planning Agent
 
 **Location**: `src/coding_agent_plugin/agents/planning.py`

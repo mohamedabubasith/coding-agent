@@ -161,6 +161,23 @@ git log --oneline
 - Preserve your existing code
 - Easy to undo (git revert)
 
+## 🤖 Modes of Operation
+
+### 1. Direct Mode (`--mode direct`)
+Best for quick tasks, single-file scripts, or specific modifications.
+- **Agent**: `CodingAgent`
+- **Behavior**: Takes your prompt and immediately writes code. No planning phase.
+- **Use Case**: "Create a script to parse CSV", "Fix the bug in main.py".
+
+### 2. Autonomous Mode (`--mode autonomous`)
+Best for building full applications or complex features.
+- **Agent**: `OrchestratorAgent` (manages Planner, Coder, Task, etc.)
+- **Behavior**:
+    1.  **Planning**: Analyzes request, creates `planning.md`.
+    2.  **Tasking**: Initializes `tasks.md`.
+    3.  **Execution**: Iterates through tasks, writing code, running commands, and updating status.
+- **Use Case**: "Build a Todo App with FastAPI and React", "Refactor the entire backend".
+
 ### 3. Multi-Project Support
 ```bash
 # Create multiple projects

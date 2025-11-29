@@ -14,7 +14,7 @@ class Project(Base):
     
     __tablename__ = "projects"
     
-    id = Column(String, primary_key=True, default=lambda: f"proj_{uuid.uuid4().hex[:12]}")
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String, unique=True, nullable=False, index=True)
     description = Column(Text)
     storage_path = Column(String, nullable=False)

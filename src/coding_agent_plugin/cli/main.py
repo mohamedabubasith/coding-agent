@@ -194,7 +194,7 @@ async def _direct_mode(
             
             result = await coding_agent.execute({
                 "file_path": filename,
-                "description": prompt,
+                "user_prompt": prompt,
                 "project_id": project_name,
                 "existing_content": existing_content
             })
@@ -208,7 +208,7 @@ async def _direct_mode(
             f"[bold green]✓ Code generated successfully![/bold green]\n\n"
             f"[cyan]File:[/cyan] {filename}\n"
             f"[cyan]Project:[/cyan] {project_name}\n"
-            f"[cyan]Location:[/cyan] {project['storage_path']}",
+            f"[cyan]Location:[/cyan] {project.storage_path}",
             title="[bold]Direct Mode Complete[/bold]",
             border_style="green"
         ))
@@ -275,7 +275,7 @@ async def _autonomous_mode(
             console.print(f"[yellow]Create it first with: agentic-coder project create {project_name}[/yellow]")
             return
         
-        project_id = project['name']
+        project_id = project.name
         logger.info(f"Using project: {project_id}")
         
         # Set model and provider if provided
@@ -351,7 +351,7 @@ async def _autonomous_mode(
         console.print(Panel.fit(
             f"[bold green]✓ Project created successfully![/bold green]\n\n"
             f"[cyan]Project:[/cyan] {project_name}\n"
-            f"[cyan]Location:[/cyan] {project['storage_path']}\n"
+            f"[cyan]Location:[/cyan] {project.storage_path}\n"
             f"[cyan]Files:[/cyan] {len(result.get('results', []))} tasks completed",
             title="[bold]Success[/bold]",
             border_style="green"
