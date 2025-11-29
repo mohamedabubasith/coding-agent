@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for v0.2.0
+### Planned for v0.4.0
 - **MCP Server Integration**: Connect custom Model Context Protocol servers for extended capabilities
 - **Project Templates**: Pre-built templates for FastAPI, Next.js, React, Django, Flask, Express
 - **Cost Tracking**: Monitor and control LLM costs with budgets
@@ -22,6 +22,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - IDE extensions (VS Code, JetBrains, Vim)
 - Multi-language support
 - Cloud deployment integration
+
+## [0.3.1] - 2024-11-30
+
+### Added
+- **Two-Mode System** for project creation:
+  - `direct` mode: Quick code generation without planning (skips `PlanningAgent`).
+  - `autonomous` mode: Full planning and orchestration (default).
+- **CLI Updates**: Added `--mode` flag to `create` command.
+- **Smart Filename Inference**: Automatically infers target filename from prompt in `direct` mode.
+
+### Fixed
+- **Git Initialization Path**: Fixed issue where git init was trying to use a hardcoded path instead of the project's storage path.
+- **Success Message**: Updated success message to show correct project location.
+
+## [0.3.0] - 2024-11-30
+
+### Added
+- **Project Management System** - Complete project lifecycle management
+  - `agentic-coder init` - First-time setup
+  - `agentic-coder project create` - Create new projects
+  - `agentic-coder project list` - List all projects
+  - `agentic-coder project switch` - Switch between projects
+  - `agentic-coder project delete` - Delete projects
+  - `agentic-coder project info` - Show project details
+- **Database Layer** - SQLite-based persistent storage
+  - Projects table with metadata
+  - Project files tracking with hashes
+  - Project versions for history
+  - User settings storage
+- **Project Isolation** - Each project in separate directory
+  - Located in `~/.agentic-coder/projects/`
+  - Database-backed file tracking
+  - Project-specific metadata
+- **Storage Manager** - File operations within projects
+  - Save/retrieve files
+  - Content hashing (SHA-256)
+  - Size tracking
+  - List project files
+- **Developer Documentation** - Complete DEVELOPER_DOC.md
+  - Architecture overview
+  - All agents explained
+  - Database schema
+  - Development workflow
+
+### Changed
+- Projects now stored in `~/.agentic-coder/projects/` instead of `./projects/`
+- CLI commands now support `--project` flag
+- Current project context tracking
+
+### Fixed
+- CLI command name correctly set to `agentic-coder`
+- SQLAlchemy reserved word conflict (`metadata` → `project_metadata`)
+- Session detachment issues with ORM objects
+
+## [0.2.1] - 2024-11-30
+
+### Fixed
+- **CRITICAL**: Fixed CLI command name from `coding-agent` to `agentic-coder`
+  - Package now correctly installs `agentic-coder` command
+  - Previous version (0.2.0) had incorrect command name
+
+## [0.2.0] - 2024-11-30
+
+### Changed
+- Improved README with cleaner, more focused content
+- Added comprehensive .gitignore file
+- Added project logo and banner
+- Updated GitHub repository URLs to correct repository
+- Enhanced roadmap section with detailed upcoming features
+- Cleaned up documentation files
+
+### Added
+- Professional branding (logo.png, banner.png)
+- MIT License information in README
+- Comprehensive .gitignore for Python projects
 
 ## [0.1.0] - 2024-11-29
 

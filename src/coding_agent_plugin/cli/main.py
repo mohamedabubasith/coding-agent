@@ -3,13 +3,17 @@ CLI entry point for coding-agent-plugin.
 Provides a user-friendly command-line interface for project generation.
 """
 
-import click
 import asyncio
+import sys
 import os
 from pathlib import Path
+from typing import Optional
+import click
 from rich.console import Console
 from rich.panel import Panel
+from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich import print as rprint
+from coding_agent_plugin.context.project_context import ProjectContext
 
 console = Console()
 
@@ -27,19 +31,29 @@ def app():
 
 @app.command()
 @click.argument("prompt", required=False)
-@click.option("--model", "-m", help="LLM model to use (overrides .env)")
-@click.option("--provider", "-p", help="LLM provider (openai, nvidia, etc.)")
+@click.option("--mode", "-m", 
+              type=click.Choice(['direct', 'autonomous'], case_sensitive=False),
+              default='autonomous',
+              help="Creation mode: 'direct' for quick coding, 'autonomous' for full planning")
+@click.option("--project", "-p", help="Target project name")
+@click.option("--model", help="LLM model to use (overrides .env)")
+@click.option("--provider", help="LLM provider (openai, nvidia, etc.)")
 @click.option("--interactive", "-i", is_flag=True, help="Review plan before generation")
 @click.option("--git", is_flag=True, default=True, help="Initialize git repository")
 @click.option("--no-git", is_flag=True, help="Skip git initialization")
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed logs")
-def create(prompt, model, provider, interactive, git, no_git, verbose):
+def create(prompt, mode, project, model, provider, interactive, git, no_git, verbose):
     """
     Create a new project from a natural language prompt.
     
+    Modes:
+        direct: Quick code generation without planning (for small tasks)
+        autonomous: Full planning + generation (for complete projects)
+    
     Examples:
-        coding-agent create "FastAPI login backend"
-        coding-agent create "React Todo App" --interactive
+        agentic-coder create "add login endpoint" --mode direct
+        agentic-coder create "FastAPI backend" --mode autonomous
+        agentic-coder create "React dashboard" --project my-app
     """
     # Handle no-git flag
     if no_git:
@@ -47,42 +61,186 @@ def create(prompt, model, provider, interactive, git, no_git, verbose):
     
     # If no prompt, enter interactive mode
     if not prompt:
-        console.print("\n[bold cyan]🤖 Coding Agent - Interactive Mode[/bold cyan]\n")
+        console.print("\n[bold cyan]🤖 Agentic Coder - Interactive Mode[/bold cyan]\n")
         prompt = click.prompt("What do you want to build?", type=str)
         
-        if not interactive:
+        if not interactive and mode == 'autonomous':
             interactive = click.confirm("Do you want to review the plan before generation?", default=True)
     
     # Display header
+    mode_emoji = "🚀" if mode == 'direct' else "🤖"
+    mode_name = "Direct Mode" if mode == 'direct' else "Autonomous Mode"
+    
     console.print(Panel.fit(
-        f"[bold green]Creating Project[/bold green]\n\n"
+        f"[bold green]{mode_emoji} {mode_name}[/bold green]\n\n"
         f"[cyan]Prompt:[/cyan] {prompt}\n"
-        f"[cyan]Model:[/cyan] {model or 'default (from .env)'}\n"
-        f"[cyan]Interactive:[/cyan] {interactive}",
-        title="[bold]Coding Agent[/bold]",
+        f"[cyan]Project:[/cyan] {project or 'current/default'}\n"
+        f"[cyan]Model:[/cyan] {model or 'default (from .env)'}",
+        title="[bold]Agentic Coder[/bold]",
         border_style="green"
     ))
     
-    # Run async creation
-    asyncio.run(_create_project(
-        prompt=prompt,
-        model=model,
-        provider=provider,
-        interactive=interactive,
-        git=git,
-        verbose=verbose
-    ))
+    # Run async creation based on mode
+    if mode == 'direct':
+        asyncio.run(_direct_mode(
+            prompt=prompt,
+            project_name=project,
+            model=model,
+            verbose=verbose
+        ))
+    else:  # autonomous mode
+        asyncio.run(_autonomous_mode(
+            prompt=prompt,
+            project_name=project,
+            model=model,
+            provider=provider,
+            interactive=interactive,
+            git=git,
+            verbose=verbose
+        ))
 
 
-async def _create_project(prompt: str, model: str = None, provider: str = None, 
-                          interactive: bool = False, git: bool = True, verbose: bool = False):
-    """Internal async function to create project."""
+
+def _infer_filename(prompt: str) -> str:
+    """
+    Infer filename from prompt using simple heuristics.
+    
+    Examples:
+        "add login endpoint" -> "auth.py"
+        "create user model" -> "user.py"
+        "fix database query" -> "database.py"
+    """
+    import re
+    
+    prompt_lower = prompt.lower()
+    
+    # Common patterns
+    if "login" in prompt_lower or "auth" in prompt_lower:
+        return "auth.py"
+    elif "user" in prompt_lower:
+        return "user.py"
+    elif "model" in prompt_lower:
+        return "models.py"
+    elif "endpoint" in prompt_lower or "route" in prompt_lower or "api" in prompt_lower:
+        return "routes.py"
+    elif "database" in prompt_lower or "db" in prompt_lower:
+        return "database.py"
+    elif "config" in prompt_lower or "setting" in prompt_lower:
+        return "config.py"
+    elif "test" in prompt_lower:
+        return "test.py"
+    elif "util" in prompt_lower or "helper" in prompt_lower:
+        return "utils.py"
+    
+    # Extract first meaningful word
+    words = re.findall(r'\b[a-z]{3,}\b', prompt_lower)
+    if words:
+        # Skip common words
+        skip_words = {'add', 'create', 'fix', 'update', 'delete', 'make', 'build', 'write'}
+        for word in words:
+            if word not in skip_words:
+                return f"{word}.py"
+    
+    # Default
+    return "main.py"
+
+
+async def _direct_mode(
+    prompt: str,
+    project_name: str,
+    model: str = None,
+    verbose: bool = False
+):
+    """
+    Direct mode: Quick code generation without planning.
+    
+    Args:
+        prompt: User's coding request
+        project_name: Target project
+        model: Optional LLM model override
+        verbose: Show detailed logs
+    """
+    from coding_agent_plugin.agents.coding import CodingAgent
+    from coding_agent_plugin.managers import StorageManager, ProjectManager
+    from coding_agent_plugin.utils.logger import logger
+    
+    console.print("[bold cyan]🚀 Direct Mode: Quick Coding[/bold cyan]\n")
+    
+    # Infer filename
+    filename = _infer_filename(prompt)
+    console.print(f"[cyan]Target file:[/cyan] {filename}\n")
+    
+    # Get or create project
+    pm = ProjectManager()
+    project = pm.get_project(project_name)
+    if not project:
+        raise ValueError(f"Project '{project_name}' not found. Create it first with 'agentic-coder project create {project_name}'")
+    
+    # Check existing content
+    sm = StorageManager()
+    existing_content = sm.get_file(project_name, filename)
+    
+    if existing_content:
+        console.print(f"[yellow]ℹ️  File exists, will update it[/yellow]\n")
+    
+    # Generate code
+    coding_agent = CodingAgent("coding")
+    
+    try:
+        with console.status("[bold green]Generating code...", spinner="dots"):
+            if model:
+                import os
+                os.environ["LLM_MODEL"] = model
+            
+            result = await coding_agent.execute({
+                "file_path": filename,
+                "description": prompt,
+                "project_id": project_name,
+                "existing_content": existing_content
+            })
+            
+            logger.info(f"Code generated for {filename}")
+        
+        console.print(f"[green]✓[/green] Generated {filename}")
+        
+        # Success message
+        console.print(Panel.fit(
+            f"[bold green]✓ Code generated successfully![/bold green]\n\n"
+            f"[cyan]File:[/cyan] {filename}\n"
+            f"[cyan]Project:[/cyan] {project_name}\n"
+            f"[cyan]Location:[/cyan] {project['storage_path']}",
+            title="[bold]Direct Mode Complete[/bold]",
+            border_style="green"
+        ))
+        
+    except Exception as e:
+        console.print(f"[red]❌ Code generation failed: {e}[/red]")
+        if verbose:
+            logger.exception("Direct mode failed")
+        raise
+
+
+async def _autonomous_mode(
+    prompt: str,
+    project_name: str,
+    model: str = None,
+    provider: str = None,
+    interactive: bool = False,
+    git: bool = True,
+    verbose: bool = False
+):
+    """
+    Autonomous mode: Full planning + generation.
+    
+    This is the original behavior with full orchestration.
+    """
     from coding_agent_plugin.agents.orchestrator import OrchestratorAgent
     from coding_agent_plugin.ui.plan_review import review_plan
     from coding_agent_plugin.integrations.git_manager import GitManager
     from coding_agent_plugin.utils.logger import logger, get_project_logger
     from coding_agent_plugin.utils.validation import validate_prompt, sanitize_project_id, ValidationError
     from coding_agent_plugin.core.config import validate_llm_config
+    from coding_agent_plugin.managers import ProjectManager
     
     try:
         # Validate LLM configuration
@@ -99,9 +257,26 @@ async def _create_project(prompt: str, model: str = None, provider: str = None,
             console.print(f"[red]❌ Invalid prompt: {e}[/red]")
             return
         
-        # Generate project ID from prompt
-        project_id = sanitize_project_id(prompt)
-        logger.info(f"Creating project: {project_id}")
+        # Get or create project
+        pm = ProjectManager()
+        
+        if not project_name:
+            # Use current project or create default
+            project_name = pm.get_current_project()
+            if not project_name:
+                console.print("[yellow]No current project. Creating 'default' project...[/yellow]")
+                pm.create_project("default", "Default project")
+                project_name = "default"
+        
+        # Verify project exists
+        project = pm.get_project(project_name)
+        if not project:
+            console.print(f"[red]❌ Project '{project_name}' not found.[/red]")
+            console.print(f"[yellow]Create it first with: agentic-coder project create {project_name}[/yellow]")
+            return
+        
+        project_id = project['name']
+        logger.info(f"Using project: {project_id}")
         
         # Set model and provider if provided
         if model:
@@ -162,9 +337,9 @@ async def _create_project(prompt: str, model: str = None, provider: str = None,
         # Phase 3: Git initialization (optional)
         if git:
             try:
-                git_mgr = GitManager(f"projects/{project_id}")
+                git_mgr = GitManager(project['storage_path'])
                 if git_mgr.init_repo():
-                    git_mgr.commit("Initial commit: project generated by coding-agent")
+                    git_mgr.commit("Initial commit: project generated by agentic-coder")
                     console.print("\n[green]✓[/green] Git repository initialized")
                     logger.info("Git repository initialized")
             except Exception as e:
@@ -175,13 +350,14 @@ async def _create_project(prompt: str, model: str = None, provider: str = None,
         # Success message
         console.print(Panel.fit(
             f"[bold green]✓ Project created successfully![/bold green]\n\n"
-            f"[cyan]Location:[/cyan] projects/{project_id}\n"
+            f"[cyan]Project:[/cyan] {project_name}\n"
+            f"[cyan]Location:[/cyan] {project['storage_path']}\n"
             f"[cyan]Files:[/cyan] {len(result.get('results', []))} tasks completed",
             title="[bold]Success[/bold]",
             border_style="green"
         ))
         
-        logger.info(f"Project {project_id} created successfully")
+        logger.info(f"Project {project_id} completed successfully")
         
     except KeyboardInterrupt:
         console.print("\n[yellow]❌ Operation cancelled by user[/yellow]")
@@ -355,7 +531,190 @@ def templates():
         table.add_row(name, desc)
     
     console.print(table)
-    console.print("\n[dim]Use: coding-agent create --template <name>[/dim]")
+    console.print("\n[dim]Use: agentic-coder create --template <name>[/dim]")
+
+
+@app.group()
+def project():
+    """Manage projects (create, list, switch, delete)."""
+    pass
+
+
+@project.command("create")
+@click.argument("name")
+@click.option("--description", "-d", help="Project description")
+def project_create(name, description):
+    """Create a new project."""
+    from coding_agent_plugin.managers import ProjectManager
+    
+    try:
+        pm = ProjectManager()
+        proj = pm.create_project(name, description)
+        
+        desc_line = f"[cyan]Description:[/cyan] {proj['description']}" if proj.get('description') else ''
+        
+        console.print(Panel.fit(
+            f"[bold green]✓ Project created successfully![/bold green]\n\n"
+            f"[cyan]Name:[/cyan] {proj['name']}\n"
+            f"[cyan]ID:[/cyan] {proj['id']}\n"
+            f"[cyan]Location:[/cyan] {proj['storage_path']}\n"
+            f"{desc_line}",
+            title="[bold]New Project[/bold]",
+            border_style="green"
+        ))
+        
+        # Set as current project
+        pm.set_current_project(name)
+        console.print(f"\n[dim]✓ Set as current project[/dim]")
+        
+    except ValueError as e:
+        console.print(f"[red]❌ Error: {e}[/red]")
+    except Exception as e:
+        console.print(f"[red]❌ Failed to create project: {e}[/red]")
+
+
+@project.command("list")
+def project_list():
+    """List all projects."""
+    from coding_agent_plugin.managers import ProjectManager
+    from rich.table import Table
+    
+    pm = ProjectManager()
+    projects = pm.list_projects()
+    
+    if not projects:
+        console.print("[yellow]No projects found. Create one with 'agentic-coder project create <name>'[/yellow]")
+        return
+    
+    current = pm.get_current_project()
+    
+    table = Table(show_header=True, header_style="bold cyan")
+    table.add_column("#", style="dim")
+    table.add_column("Name", style="green")
+    table.add_column("Description")
+    table.add_column("Created", style="dim")
+    table.add_column("Status")
+    
+    for idx, proj in enumerate(projects, 1):
+        is_current = "⭐ Active" if proj["name"] == current else ""
+        created = proj["created_at"][:10] if proj["created_at"] else "N/A"
+        desc = proj["description"] or "[dim]No description[/dim]"
+        
+        table.add_row(
+            str(idx),
+            proj["name"],
+            desc,
+            created,
+            is_current
+        )
+    
+    console.print(table)
+    console.print(f"\n[dim]Total: {len(projects)} project(s)[/dim]")
+
+
+@project.command("switch")
+@click.argument("name")
+def project_switch(name):
+    """Switch to a different project."""
+    from coding_agent_plugin.managers import ProjectManager
+    
+    pm = ProjectManager()
+    
+    if pm.set_current_project(name):
+        console.print(f"[green]✓ Switched to project '[bold]{name}[/bold]'[/green]")
+    else:
+        console.print(f"[red]❌ Project '{name}' not found[/red]")
+
+
+@project.command("delete")
+@click.argument("name")
+@click.option("--yes", "-y", is_flag=True, help="Skip confirmation")
+def project_delete(name, yes):
+    """Delete a project and all its files."""
+    from coding_agent_plugin.managers import ProjectManager
+    
+    if not yes:
+        confirm = click.confirm(
+            f"Are you sure you want to delete project '{name}' and all its files?",
+            default=False
+        )
+        if not confirm:
+            console.print("[yellow]Cancelled[/yellow]")
+            return
+    
+    pm = ProjectManager()
+    
+    if pm.delete_project(name):
+        console.print(f"[green]✓ Project '{name}' deleted successfully[/green]")
+    else:
+        console.print(f"[red]❌ Project '{name}' not found[/red]")
+
+
+@project.command("info")
+@click.argument("name", required=False)
+def project_info(name):
+    """Show detailed project information."""
+    from coding_agent_plugin.managers import ProjectManager
+    
+    pm = ProjectManager()
+    
+    # If no name provided, use current project
+    if not name:
+        name = pm.get_current_project()
+        if not name:
+            console.print("[red]❌ No current project set. Specify a project name or switch to one.[/red]")
+            return
+    
+    stats = pm.get_project_stats(name)
+    
+    if not stats:
+        console.print(f"[red]❌ Project '{name}' not found[/red]")
+        return
+    
+    console.print(Panel.fit(
+        f"[bold cyan]Project Information[/bold cyan]\n\n"
+        f"[cyan]Name:[/cyan] {stats['name']}\n"
+        f"[cyan]ID:[/cyan] {stats['id']}\n"
+        f"[cyan]Description:[/cyan] {stats['description'] or 'N/A'}\n"
+        f"[cyan]Location:[/cyan] {stats['storage_path']}\n"
+        f"[cyan]Files:[/cyan] {stats['file_count']}\n"
+        f"[cyan]Size:[/cyan] {stats['total_size_mb']} MB\n"
+        f"[cyan]Created:[/cyan] {stats['created_at'][:19] if stats['created_at'] else 'N/A'}\n"
+        f"[cyan]Updated:[/cyan] {stats['updated_at'][:19] if stats['updated_at'] else 'N/A'}",
+        title=f"[bold]{stats['name']}[/bold]",
+        border_style="cyan"
+    ))
+
+
+@app.command()
+def init():
+    """Initialize agentic-coder (first-time setup)."""
+    from coding_agent_plugin.models import init_db
+    from coding_agent_plugin.models.database import AGENTIC_HOME
+    
+    console.print("\n[bold cyan]🚀 Initializing Agentic Coder...[/bold cyan]\n")
+    
+    # Create home directory
+    AGENTIC_HOME.mkdir(parents=True, exist_ok=True)
+    console.print(f"[green]✓[/green] Created home directory: {AGENTIC_HOME}")
+    
+    # Initialize database
+    init_db()
+    console.print(f"[green]✓[/green] Initialized database")
+    
+    # Create projects directory
+    (AGENTIC_HOME / "projects").mkdir(exist_ok=True)
+    console.print(f"[green]✓[/green] Created projects directory")
+    
+    console.print(Panel.fit(
+        "[bold green]✓ Initialization complete![/bold green]\n\n"
+        "[cyan]Next steps:[/cyan]\n"
+        "1. Create a project: [bold]agentic-coder project create <name>[/bold]\n"
+        "2. Generate code: [bold]agentic-coder create \"description\"[/bold]\n"
+        "3. List projects: [bold]agentic-coder project list[/bold]",
+        title="[bold]Ready to Go![/bold]",
+        border_style="green"
+    ))
 
 
 if __name__ == "__main__":

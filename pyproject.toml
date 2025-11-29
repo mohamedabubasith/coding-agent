@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agentic-coder"  # Must be unique on PyPI
-version = "0.2.0"
+version = "0.3.1"
 description = "AI-powered autonomous project creator and iterative developer"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -59,7 +59,7 @@ Repository = "https://github.com/mohamedabubasith/coding-agent"
 Issues = "https://github.com/mohamedabubasith/coding-agent/issues"
 
 [project.scripts]
-coding-agent = "coding_agent_plugin.cli.main:app"
+agentic-coder = "coding_agent_plugin.cli.main:app"
 
 [tool.uv]
 dev-dependencies = [
