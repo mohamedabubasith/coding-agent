@@ -1,99 +1,304 @@
-# Coding Agent Plugin
+# Coding Agent Plugin 🤖
 
-A modular, autonomous agent orchestration system for end-to-end software development. This plugin orchestrates multiple specialized agents (Planning, Coding, Task, Error, Execution) to generate, plan, code, fix, and execute entire software projects.
+<p align="center">
+  <img src="artifacts/coding_agent_logo.webp" alt="Coding Agent Plugin Logo" width="200"/>
+</p>
 
-## Features
+<p align="center">
+  <strong>Your AI-Powered Project Creator & Iterative Developer</strong>
+</p>
 
-- **Autonomous Orchestration**: Automatically manages the full software development lifecycle (Planning -> Scaffolding -> Coding -> Verification).
-- **Self-Healing**: Automatic error detection and recovery using the ErrorAgent. Failed tasks are automatically retried after fixes.
-- **Multi-Agent System**:
-    -   **Planning Agent**: Architects the solution and creates a detailed task list using LLMs.
-    -   **Coding Agent**: Generates code and updates existing files (context-aware).
-    -   **Task Agent**: Manages project structure and task tracking.
-    -   **Error Agent**: Identifies and fixes errors in code automatically.
-    -   **Execution Agent**: Runs builds, tests, and shell commands to verify functionality.
-- **Persistent Storage**: All project files are stored in a `projects/{project_id}` directory.
-- **Hidden Context Files**: Internal files (`.agent_context/planning.md`, `tasks.md`, `execution.md`) are hidden to keep the workspace clean.
-- **Configurable Models**: Support for different LLM models (e.g., `gpt-4o`, `gpt-3.5-turbo`) via environment variables.
+<p align="center">
+  <a href="https://github.com/abuabbasit/coding-agent-plugin"><img src="https://img.shields.io/github/stars/abuabbasit/coding-agent-plugin?style=social" alt="GitHub stars"></a>
+  <a href="https://pypi.org/project/coding-agent-plugin/"><img src="https://img.shields.io/pypi/v/coding-agent-plugin" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/coding-agent-plugin/"><img src="https://img.shields.io/pypi/dm/coding-agent-plugin" alt="Downloads"></a>
+  <a href="https://github.com/abuabbasit/coding-agent-plugin/blob/main/LICENSE"><img src="https://img.shields.io/github/license/abuabbasit/coding-agent-plugin" alt="License"></a>
+</p>
 
-## Installation
+---
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/your-repo/coding-agent-plugin.git
-    cd coding-agent-plugin
-    ```
+## 🚀 What is Coding Agent Plugin?
 
-2.  Install dependencies:
-    ```bash
-    pip install -e .
-    ```
+**Coding Agent Plugin** is an autonomous AI-powered tool that creates complete, production-ready projects from natural language descriptions. Unlike traditional code generators, it doesn't just scaffold - it **thinks, plans, codes, verifies, and iteratively improves** your projects.
 
-3.  Set up environment variables:
-    Create a `.env` file in the root directory:
-    ```env
-    OPENAI_API_KEY=your_api_key_here
-    LLM_MODEL=gpt-4o  # Optional: Defaults to gpt-4o, use gpt-3.5-turbo for lower cost
-    ```
+Think of it as having an AI pair programmer that:
+- 🧠 **Understands** your requirements
+- 📋 **Plans** the architecture
+- 💻 **Writes** production-ready code
+- ✅ **Tests** and verifies everything works
+- 🔄 **Iteratively improves** based on your feedback
 
-## Usage
+## ✨ Key Features
 
-### Autonomous Mode (Recommended)
+### 🎯 Autonomous Project Creation
+Create complete projects from a single prompt. No manual scaffolding, no boilerplate copying.
 
-The autonomous mode automatically plans, scaffolds, codes, verifies, and fixes errors:
-
-```python
-import asyncio
-from coding_agent_plugin.agents.orchestrator import OrchestratorAgent
-
-async def main():
-    orchestrator = OrchestratorAgent()
-    
-    # Create a full-stack Todo App with automatic error handling
-    await orchestrator.execute(
-        mode="autonomous",
-        user_prompt="Create a FastAPI backend with login and register endpoints",
-        project_id="auth_backend_v1"
-    )
-
-if __name__ == "__main__":
-    asyncio.run(main())
+```bash
+coding-agent create "FastAPI backend with JWT auth, PostgreSQL, and OAuth"
 ```
 
-**What happens:**
-1. **Planning**: LLM generates a comprehensive plan with architecture and task list
-2. **Execution**: Each task is executed step-by-step (scaffolding, coding, verification)
-3. **Error Handling**: If any task fails, ErrorAgent automatically attempts to fix it (up to 2 retries)
-4. **Results**: All generated files are saved in `projects/auth_backend_v1/`
+### 🔄 Iterative Improvement
+Continuously improve your project with natural language requests.
 
-### Manual Mode
-
-You can also interact with specific agents:
-
-```python
-# Generate a plan
-await orchestrator.execute("planning", "Create a calculator", "calc_project")
-
-# Generate code
-await orchestrator.execute("coding", "Write a python function to add numbers", "calc_project")
+```bash
+coding-agent improve "add email verification"
+coding-agent improve "add comprehensive tests"
+coding-agent improve "optimize database queries"
 ```
 
-## Project Structure
+### 🎨 Interactive Planning
+Review and approve plans before generation. See what will be built before committing.
 
-Projects are created in the `projects/` directory:
-
-```
-projects/
-  ├── todo_app_v1/
-  │   ├── planning.md       # Project plan and architecture
-  │   ├── tasks.md          # Task tracking
-  │   ├── execution.md      # Execution logs
-  │   ├── backend/          # Generated backend code
-  │   │   └── main.py
-  │   └── frontend/         # Generated frontend code
-  │       └── index.html
+```bash
+coding-agent create "My App" --interactive
 ```
 
-## Contributing
+### 📦 Multi-Agent System
+- **Planning Agent**: Architects your solution
+- **Coding Agent**: Writes context-aware code
+- **File Modifier**: Makes surgical edits to existing files
+- **Execution Agent**: Runs and verifies your code
+- **Error Agent**: Automatically fixes issues
 
-Contributions are welcome! Please submit a pull request.
+### 🎭 Beautiful CLI
+- Rich terminal UI with progress bars
+- Color-coded output
+- Clear error messages
+- Interactive prompts
+
+### 🔐 Version Control Built-in
+- Auto-initializes Git repository
+- Commits each change automatically
+- Easy rollback with `git revert`
+- Full change history
+
+### 🌐 Multi-Provider Support
+Works with any OpenAI-compatible API:
+- OpenAI (GPT-4, GPT-3.5)
+- NVIDIA AI
+- Groq
+- OpenRouter
+- Local models (Ollama, LM Studio)
+
+## 📦 Installation
+
+```bash
+pip install coding-agent-plugin
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/abuabbasit/coding-agent-plugin.git
+cd coding-agent-plugin
+pip install -e .
+```
+
+## ⚙️ Configuration
+
+Create a `.env` file in your project root:
+
+```env
+# Required
+LLM_API_KEY=your_api_key_here
+
+# Optional
+LLM_MODEL=gpt-4o                          # Default model
+LLM_BASE_URL=https://api.openai.com/v1   # API endpoint
+```
+
+## 🎯 Quick Start
+
+### Create Your First Project
+
+```bash
+# Simple creation
+coding-agent create "FastAPI Todo App with SQLite"
+
+# With interactive planning
+coding-agent create "React Dashboard" --interactive
+
+# Using specific model
+coding-agent create "Django Blog" --model gpt-3.5-turbo
+```
+
+### Improve Existing Project
+
+```bash
+# Navigate to your project
+cd projects/my_project/
+
+# Make improvements
+coding-agent improve "add authentication"
+coding-agent improve "add comprehensive logging"
+
+# Interactive mode
+coding-agent improve --interactive
+```
+
+## 📚 Usage Examples
+
+### Example 1: Create a Complete Backend
+
+```bash
+coding-agent create "FastAPI backend with:
+- User authentication (JWT)
+- CRUD operations for todos
+- PostgreSQL database
+- Pydantic validation
+- Comprehensive tests
+- API documentation" --interactive
+```
+
+**Result:**
+```
+projects/fastapi_backend/
+├── app/
+│   ├── main.py          # FastAPI app with all endpoints
+│   ├── auth.py          # JWT authentication
+│   ├── models.py        # SQLAlchemy models
+│   ├── database.py      # DB connection
+│   ├── crud.py          # CRUD operations
+│   └── requirements.txt # All dependencies
+├── tests/
+│   └── test_main.py     # Comprehensive tests
+└── .git/                # Git repository initialized
+```
+
+### Example 2: Iterative Development
+
+```bash
+# Create initial project
+coding-agent create "Simple Flask API"
+
+# Navigate to project
+cd projects/simple_flask_api/
+
+# Add features incrementally
+coding-agent improve "add user registration endpoint"
+coding-agent improve "add email validation"
+coding-agent improve "add rate limiting"
+coding-agent improve "add comprehensive error handling"
+
+# Check what changed
+git log --oneline
+```
+
+### Example 3: Use with Different Providers
+
+**OpenAI:**
+```bash
+# .env
+LLM_API_KEY=sk-...
+LLM_MODEL=gpt-4o
+```
+
+**NVIDIA:**
+```bash
+# .env
+LLM_BASE_URL=https://integrate.api.nvidia.com/v1
+LLM_API_KEY=nvapi-...
+LLM_MODEL=qwen/qwen3-next-80b-a3b-instruct
+```
+
+**Groq:**
+```bash
+# .env
+LLM_BASE_URL=https://api.groq.com/openai/v1
+LLM_API_KEY=gsk_...
+LLM_MODEL=llama-3.3-70b-versatile
+```
+
+## 🎓 Documentation
+
+- [User Guide](USER_GUIDE.md) - Complete walkthrough
+- [Roadmap](ROADMAP.md) - Future features
+- [Contributing](CONTRIBUTING.md) - How to contribute
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│           CLI (User Interface)              │
+└─────────────────┬───────────────────────────┘
+                  │
+┌─────────────────▼───────────────────────────┐
+│         Orchestrator Agent                  │
+│  (Manages workflow and agent coordination)  │
+└─────┬─────┬─────┬─────┬─────┬──────────────┘
+      │     │     │     │     │
+      ▼     ▼     ▼     ▼     ▼
+    Plan  Code  Task  Exec  Error
+    Agent Agent Agent Agent Agent
+```
+
+## 💰 Cost Estimation
+
+Typical costs with GPT-4:
+- **Create Project**: $0.10 - $0.30 per project
+- **Improve**: $0.04 - $0.10 per improvement
+
+Use cheaper models to reduce costs:
+- GPT-3.5-turbo: ~10x cheaper
+- NVIDIA/Groq: Often free or very cheap
+- Local models: Free!
+
+## 🤝 Contributing
+
+We love contributions! Please read our [Contributing Guide](CONTRIBUTING.md) to get started.
+
+### Development Setup
+
+```bash
+# Clone repository
+git clone https://github.com/abuabbasit/coding-agent-plugin.git
+cd coding-agent-plugin
+
+# Install dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Run CLI locally
+export PYTHONPATH=$PYTHONPATH:$(pwd)/src
+python3 -m coding_agent_plugin.cli.main --help
+```
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🌟 Acknowledgments
+
+- Built with [LangChain](https://github.com/langchain-ai/langchain)
+- CLI powered by [Click](https://click.palletsprojects.com/)
+- Beautiful UI with [Rich](https://github.com/Textualize/rich)
+- Inspired by [Devin](https://www.cognition.ai/), [v0](https://v0.dev/), and [Bolt.new](https://bolt.new/)
+
+## 📧 Support
+
+- 🐛 [Report a bug](https://github.com/abuabbasit/coding-agent-plugin/issues)
+- 💡 [Request a feature](https://github.com/abuabbasit/coding-agent-plugin/issues)
+- 💬 [Join discussions](https://github.com/abuabbasit/coding-agent-plugin/discussions)
+
+## 🎯 Roadmap
+
+See our [Roadmap](ROADMAP.md) for upcoming features including:
+- 📦 Built-in project templates
+- 🧪 Automatic test generation
+- 📊 Cost tracking and budgets
+- 🔌 Plugin system
+- 🌐 Web UI
+- And much more!
+
+---
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/abuabbasit">Mohamed Abu Basith</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/abuabbasit/coding-agent-plugin">⭐ Star us on GitHub</a> • 
+  <a href="https://pypi.org/project/coding-agent-plugin/">📦 Install from PyPI</a>
+</p>
