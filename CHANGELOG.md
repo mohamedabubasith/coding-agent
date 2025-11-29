@@ -23,6 +23,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-language support
 - Cloud deployment integration
 
+## [0.3.23] - 2024-11-30
+
+### Improved
+- **Architectural Awareness**: Agents now analyze existing project structure to maintain consistency in naming and patterns (e.g., using `routers.py` if established).
+- **Import Logic**: `CodingAgent` now uses the actual file list to generate correct relative imports, preventing hallucinated modules.
+- **Iterative Workflow**: Fixed a bug where follow-up tasks would overwrite files instead of modifying them.
+
+### Fixed
+- **DB Path**: Fixed `db_path` property to correctly handle non-SQLite database URLs.
+- **Task Execution**: Fixed `file_path` extraction in `CodingAgent` to handle nested task details.
+
 ## [0.3.22] - 2024-11-30
 
 ### Added

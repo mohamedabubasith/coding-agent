@@ -1,2 +1,0 @@
-
-- [ ] Initialize backend directory

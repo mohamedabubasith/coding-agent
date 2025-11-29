@@ -176,6 +176,10 @@ async def _direct_mode(
     if not project:
         raise ValueError(f"Project '{project_name}' not found. Create it first with 'agentic-coder project create {project_name}'")
     
+    # Normalize to dict
+    if hasattr(project, "to_dict"):
+        project = project.to_dict()
+    
     # Check existing content
     sm = StorageManager()
     existing_content = sm.get_file(project_name, filename)
@@ -208,7 +212,7 @@ async def _direct_mode(
             f"[bold green]✓ Code generated successfully![/bold green]\n\n"
             f"[cyan]File:[/cyan] {filename}\n"
             f"[cyan]Project:[/cyan] {project_name}\n"
-            f"[cyan]Location:[/cyan] {project.storage_path}",
+            f"[cyan]Location:[/cyan] {project['storage_path']}",
             title="[bold]Direct Mode Complete[/bold]",
             border_style="green"
         ))
@@ -283,6 +287,10 @@ async def _autonomous_mode(
                 console.print(f"[red]❌ Failed to create project: {e}[/red]")
                 return
         
+        # Normalize to dict
+        if hasattr(project, "to_dict"):
+            project = project.to_dict()
+            
         project_id = project['id']
         logger.info(f"Using project: {project_id}")
         

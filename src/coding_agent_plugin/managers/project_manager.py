@@ -10,6 +10,47 @@ from coding_agent_plugin.models.database import AGENTIC_HOME
 
 class ProjectManager:
     """Manages project creation, listing, and switching."""
+    @property
+    def db_path(self) -> str:
+        """Get database path or URL."""
+        from coding_agent_plugin.models.database import DATABASE_URL
+        if DATABASE_URL.startswith("sqlite:///"):
+            return DATABASE_URL.replace("sqlite:///", "")
+        return DATABASE_URL
+
+    def list_files(self, project_name_or_id: str) -> List[str]:
+        """
+        List all files in a project (excluding hidden/system files).
+        
+        Args:
+            project_name_or_id: Project name or ID
+            
+        Returns:
+            List of relative file paths
+        """
+        project = self.get_project(project_name_or_id)
+        if not project:
+            return []
+            
+        base_path = Path(project.storage_path) # Access storage_path directly from Project object
+        if not base_path.exists():
+            return []
+            
+        files = []
+        for path in base_path.rglob("*"):
+            if path.is_file():
+                # Get relative path
+                rel_path = path.relative_to(base_path)
+                
+                # Skip hidden directories and files
+                if any(part.startswith(".") for part in rel_path.parts):
+                    continue
+                if any(part == "__pycache__" for part in rel_path.parts):
+                    continue
+                    
+                files.append(str(rel_path))
+                
+        return sorted(files)
     
     def __init__(self):
         """Initialize project manager."""

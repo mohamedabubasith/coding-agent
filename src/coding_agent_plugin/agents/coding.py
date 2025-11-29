@@ -31,6 +31,8 @@ class CodingAgent(BaseAgent):
         user_prompt = task.get("user_prompt")
         project_id = task.get("project_id")
         file_path_relative = task.get("file_path") # Optional: specific file to write to
+        if not file_path_relative and "details" in task:
+            file_path_relative = task["details"].get("file_path")
         
         if not user_prompt or not project_id:
             raise ValueError("Missing user_prompt or project_id")
@@ -52,13 +54,16 @@ class CodingAgent(BaseAgent):
                 with open(full_path, "r") as f:
                     existing_content = f.read()
         
-        code_content = await self.generate_code(user_prompt, existing_content)
+        # Get all project files for context
+        project_files = pm.list_files(project_id)
+        
+        code_content = await self.generate_code(user_prompt, existing_content, project_files)
         
         saved_path = self.save_code(project_id, code_content, file_path_relative)
         
         return {"file_path": saved_path, "code": code_content}
 
-    async def generate_code(self, prompt: str, existing_content: str | None = None) -> str:
+    async def generate_code(self, prompt: str, existing_content: str | None = None, project_files: list[str] = None) -> str:
         """Generate code using LLM."""
         system_content = """You are an expert coding assistant. Generate clean, production-ready code for the given task.
 IMPORTANT RULES:
@@ -66,9 +71,14 @@ IMPORTANT RULES:
 - Do NOT include any markdown formatting (no ```python or ``` blocks)
 - Do NOT include explanations or comments outside the code
 - Write complete, working code that can be directly executed
+- USE EXISTING FILE PATHS to determine correct imports (e.g. if 'app/auth/routers.py' exists, import from 'app.auth.routers').
 """
         
         user_content = prompt
+        
+        if project_files:
+            user_content += f"\n\nProject Structure:\n{', '.join(project_files)}\n"
+            
         if existing_content:
             user_content += f"\n\nExisting content of the file:\n{existing_content}\n\nPlease update the code based on the request."
             

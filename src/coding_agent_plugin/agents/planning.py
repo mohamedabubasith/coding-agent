@@ -35,38 +35,55 @@ class PlanningAgent(BaseAgent):
             raise ValueError("Missing user_prompt or project_id")
 
         self.log(f"Executing planning task: {user_prompt}")
-        workflow = await self.plan(user_prompt)
+        
+        # Get existing files
+        existing_files = self.pm.list_files(project_id)
+        
+        workflow = await self.plan(user_prompt, existing_files)
         
         self.save_plan(project_id, workflow)
         
         return {"workflow": workflow}
 
-    async def plan(self, user_input: str) -> Dict[str, Any]:
+    async def plan(self, user_input: str, existing_files: List[str] = None) -> Dict[str, Any]:
         """Plan the workflow for the user's input using LangChain."""
         self.log(f"Planning workflow for: {user_input}")
         
-        system_prompt = SystemMessage(content="""You are a software architect. Create a comprehensive plan for the user's request.
+        files_context = ""
+        if existing_files:
+            files_context = f"\nExisting Project Files:\n{', '.join(existing_files)}\n"
+            files_context += """
+IMPORTANT GUIDELINES FOR EXISTING PROJECTS:
+1. ANALYZE the existing file structure and naming conventions carefully.
+2. FOLLOW the established patterns for new modules (e.g., if 'routers.py' is used for routes in one module, use 'routers.py' for new modules too).
+3. DO NOT create redundant files if shared utilities already exist (e.g., use existing database/crud.py if applicable).
+4. INTEGRATE new files seamlessly into the existing architecture (e.g., ensure main.py imports new routers correctly).
+5. MAINTAIN consistency in coding style and structure.
+"""
+        
+        system_prompt = SystemMessage(content=f"""You are a software architect. Create a comprehensive plan for the user's request.
+        {files_context}
         Return a JSON object with the following structure:
-        {
-            "architecture": {
+        {{
+            "architecture": {{
                 "component_name": ["file1", "file2"]
-            },
+            }},
             "tasks": [
-                {
+                {{
                     "id": 1,
                     "phase": "scaffold|coding|verification",
                     "description": "Task description",
                     "agent": "task|coding|execution",
-                    "details": {
+                    "details": {{
                         "action": "create_dirs", 
                         "paths": ["dir1"],
                         "file_path": "path/to/file",
                         "prompt": "Instructions for coding agent",
                         "command": "Shell command for execution agent"
-                    }
-                }
+                    }}
+                }}
             ]
-        }
+        }}
         Ensure the plan is detailed and covers scaffolding, coding, and verification.
         IMPORTANT: Return ONLY the JSON object. Do not include any markdown formatting or explanation.
         """)
