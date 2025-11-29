@@ -164,9 +164,9 @@ git log --oneline
 ### 3. Multi-Project Support
 ```bash
 # Create multiple projects
-coding-agent create "Frontend Dashboard"
-coding-agent create "Backend API"
-coding-agent create "Mobile App"
+agentic-coder create "Frontend Dashboard"
+agentic-coder create "Backend API"
+agentic-coder create "Mobile App"
 
 # Each in its own directory:
 projects/
@@ -178,8 +178,8 @@ projects/
 ### 4. Template Support (Coming Soon)
 ```bash
 # Use pre-built templates
-coding-agent create --template fastapi-crud "My API"
-coding-agent create --template nextjs-auth "My App"
+agentic-coder create --template fastapi-crud "My API"
+agentic-coder create --template nextjs-auth "My App"
 ```
 
 ## 🔧 Environment Setup
@@ -200,7 +200,7 @@ LLM_BASE_URL=https://api.openai.com/v1  # Optional
 
 ## 🆘 Troubleshooting
 
-### "Not a coding-agent project!"
+### "Not a agentic-coder project!"
 **Problem:** Running `improve` outside a project directory
 **Solution:** 
 ```bash
@@ -212,7 +212,7 @@ python3 -m coding_agent_plugin.cli.main improve "your request"
 **Problem:** Git not installed or permission issues
 **Solution:** Install git or use `--no-git` flag
 ```bash
-coding-agent create "App" --no-git
+agentic-coder create "App" --no-git
 ```
 
 ### Planning failed

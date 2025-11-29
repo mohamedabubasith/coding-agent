@@ -1,7 +1,11 @@
-# Coding Agent Plugin 🤖
+# Agentic Coder 🤖
 
 <p align="center">
-  <img src="artifacts/coding_agent_logo.webp" alt="Coding Agent Plugin Logo" width="200"/>
+  <img src="banner.png" alt="Agentic Coder Banner" width="100%"/>
+</p>
+
+<p align="center">
+  <img src="logo.png" alt="Agentic Coder Logo" width="200"/>
 </p>
 
 <p align="center">
@@ -9,10 +13,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/abuabbasit/coding-agent-plugin"><img src="https://img.shields.io/github/stars/abuabbasit/coding-agent-plugin?style=social" alt="GitHub stars"></a>
-  <a href="https://pypi.org/project/coding-agent-plugin/"><img src="https://img.shields.io/pypi/v/coding-agent-plugin" alt="PyPI version"></a>
-  <a href="https://pypi.org/project/coding-agent-plugin/"><img src="https://img.shields.io/pypi/dm/coding-agent-plugin" alt="Downloads"></a>
-  <a href="https://github.com/abuabbasit/coding-agent-plugin/blob/main/LICENSE"><img src="https://img.shields.io/github/license/abuabbasit/coding-agent-plugin" alt="License"></a>
+  <a href="https://github.com/abuabbasit/agentic-coder"><img src="https://img.shields.io/github/stars/abuabbasit/agentic-coder?style=social" alt="GitHub stars"></a>
+  <a href="https://pypi.org/project/agentic-coder/"><img src="https://img.shields.io/pypi/v/agentic-coder" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/agentic-coder/"><img src="https://img.shields.io/pypi/dm/agentic-coder" alt="Downloads"></a>
+  <a href="https://github.com/abuabbasit/agentic-coder/blob/main/LICENSE"><img src="https://img.shields.io/github/license/abuabbasit/agentic-coder" alt="License"></a>
 </p>
 
 ---
@@ -34,23 +38,23 @@ Think of it as having an AI pair programmer that:
 Create complete projects from a single prompt. No manual scaffolding, no boilerplate copying.
 
 ```bash
-coding-agent create "FastAPI backend with JWT auth, PostgreSQL, and OAuth"
+agentic-coder create "FastAPI backend with JWT auth, PostgreSQL, and OAuth"
 ```
 
 ### 🔄 Iterative Improvement
 Continuously improve your project with natural language requests.
 
 ```bash
-coding-agent improve "add email verification"
-coding-agent improve "add comprehensive tests"
-coding-agent improve "optimize database queries"
+agentic-coder improve "add email verification"
+agentic-coder improve "add comprehensive tests"
+agentic-coder improve "optimize database queries"
 ```
 
 ### 🎨 Interactive Planning
 Review and approve plans before generation. See what will be built before committing.
 
 ```bash
-coding-agent create "My App" --interactive
+agentic-coder create "My App" --interactive
 ```
 
 ### 📦 Multi-Agent System
@@ -83,14 +87,14 @@ Works with any OpenAI-compatible API:
 ## 📦 Installation
 
 ```bash
-pip install coding-agent-plugin
+pip install agentic-coder
 ```
 
 Or install from source:
 
 ```bash
-git clone https://github.com/abuabbasit/coding-agent-plugin.git
-cd coding-agent-plugin
+git clone https://github.com/abuabbasit/agentic-coder.git
+cd agentic-coder
 pip install -e .
 ```
 
@@ -113,13 +117,13 @@ LLM_BASE_URL=https://api.openai.com/v1   # API endpoint
 
 ```bash
 # Simple creation
-coding-agent create "FastAPI Todo App with SQLite"
+agentic-coder create "FastAPI Todo App with SQLite"
 
 # With interactive planning
-coding-agent create "React Dashboard" --interactive
+agentic-coder create "React Dashboard" --interactive
 
 # Using specific model
-coding-agent create "Django Blog" --model gpt-3.5-turbo
+agentic-coder create "Django Blog" --model gpt-3.5-turbo
 ```
 
 ### Improve Existing Project
@@ -129,11 +133,11 @@ coding-agent create "Django Blog" --model gpt-3.5-turbo
 cd projects/my_project/
 
 # Make improvements
-coding-agent improve "add authentication"
-coding-agent improve "add comprehensive logging"
+agentic-coder improve "add authentication"
+agentic-coder improve "add comprehensive logging"
 
 # Interactive mode
-coding-agent improve --interactive
+agentic-coder improve --interactive
 ```
 
 ## 📚 Usage Examples
@@ -141,7 +145,7 @@ coding-agent improve --interactive
 ### Example 1: Create a Complete Backend
 
 ```bash
-coding-agent create "FastAPI backend with:
+agentic-coder create "FastAPI backend with:
 - User authentication (JWT)
 - CRUD operations for todos
 - PostgreSQL database
@@ -169,16 +173,16 @@ projects/fastapi_backend/
 
 ```bash
 # Create initial project
-coding-agent create "Simple Flask API"
+agentic-coder create "Simple Flask API"
 
 # Navigate to project
 cd projects/simple_flask_api/
 
 # Add features incrementally
-coding-agent improve "add user registration endpoint"
-coding-agent improve "add email validation"
-coding-agent improve "add rate limiting"
-coding-agent improve "add comprehensive error handling"
+agentic-coder improve "add user registration endpoint"
+agentic-coder improve "add email validation"
+agentic-coder improve "add rate limiting"
+agentic-coder improve "add comprehensive error handling"
 
 # Check what changed
 git log --oneline
@@ -251,8 +255,8 @@ We love contributions! Please read our [Contributing Guide](CONTRIBUTING.md) to 
 
 ```bash
 # Clone repository
-git clone https://github.com/abuabbasit/coding-agent-plugin.git
-cd coding-agent-plugin
+git clone https://github.com/abuabbasit/agentic-coder.git
+cd agentic-coder
 
 # Install dependencies
 pip install -e ".[dev]"
@@ -278,27 +282,138 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Support
 
-- 🐛 [Report a bug](https://github.com/abuabbasit/coding-agent-plugin/issues)
-- 💡 [Request a feature](https://github.com/abuabbasit/coding-agent-plugin/issues)
-- 💬 [Join discussions](https://github.com/abuabbasit/coding-agent-plugin/discussions)
+- 🐛 [Report a bug](https://github.com/abuabbasit/agentic-coder/issues)
+- 💡 [Request a feature](https://github.com/abuabbasit/agentic-coder/issues)
+- 💬 [Join discussions](https://github.com/abuabbasit/agentic-coder/discussions)
 
-## 🎯 Roadmap
+## 🎯 Roadmap & Upcoming Features
 
-See our [Roadmap](ROADMAP.md) for upcoming features including:
-- 📦 Built-in project templates
-- 🧪 Automatic test generation
-- 📊 Cost tracking and budgets
-- 🔌 Plugin system
-- 🌐 Web UI
-- And much more!
+We're constantly improving Agentic Coder! Here's what's coming next:
+
+### 🚀 Version 0.2.0 (Next Release)
+
+#### 🔌 MCP Server Integration
+**Add your own tools and context!** Connect custom [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) servers to extend agent capabilities:
+
+```bash
+# .env
+MCP_SERVERS=filesystem,database,slack
+
+# Configure MCP servers
+[mcp.filesystem]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed"]
+
+[mcp.database]
+command = "npx" 
+args = ["-y", "@modelcontextprotocol/server-postgres", "postgresql://..."]
+```
+
+**Use Cases:**
+- 📁 **File System Access**: Read/write project files
+- 🗄️ **Database**: Query your database for context
+- 💬 **Slack/Discord**: Fetch team discussions
+- 🌐 **Web Scraping**: Get real-time documentation
+- 🔧 **Custom Tools**: Build your own MCP servers
+
+#### 📦 Project Templates
+Pre-built templates for common project types:
+- FastAPI CRUD API
+- Next.js with Auth
+- React Dashboard
+- Django Blog
+- Flask Microservice
+- Express.js API
+
+```bash
+agentic-coder create --template fastapi-crud "My API"
+agentic-coder templates list
+```
+
+#### 📊 Cost Tracking & Budgets
+Monitor and control LLM costs:
+```bash
+agentic-coder create "App" --max-cost 1.00
+agentic-coder cost show  # View usage
+```
+
+### 🔮 Version 0.3.0 (Future)
+
+#### 🌐 Web UI
+Browser-based interface:
+- Visual project creation
+- Real-time code preview
+- Interactive planning
+- Deployment integration
+
+#### 🧪 Automatic Test Generation
+AI-powered test creation:
+- Unit tests
+- Integration tests  
+- E2E tests
+- Test coverage optimization
+
+#### 🔍 Code Review Agent
+Automated code quality checks:
+- Security vulnerability scanning
+- Performance optimization suggestions
+- Best practices enforcement
+- Documentation quality checks
+
+### 🎨 Version 0.4.0 (Further Out)
+
+#### 🤖 Multi-Agent Collaboration
+Multiple specialized agents working together:
+- Frontend specialist
+- Backend specialist
+- Database architect
+- DevOps engineer
+
+#### 📱 IDE Extensions
+- VS Code extension
+- JetBrains plugin
+- Vim/Neovim plugin
+
+#### 🌍 Language Support
+Beyond Python:
+- JavaScript/TypeScript
+- Go
+- Rust
+- Java
+- C#
+
+#### ☁️ Cloud Deployment Integration
+One-command deployment:
+```bash
+agentic-coder deploy --platform vercel
+agentic-coder deploy --platform aws
+```
+
+### 💡 Community Requested Features
+
+Vote for features you want on our [GitHub Discussions](https://github.com/abuabbasit/agentic-coder/discussions)!
+
+**Top Requests:**
+1. ⭐ **MCP Server Support** (In Progress - v0.2.0)
+2. ⭐ **Project Templates** (In Progress - v0.2.0)
+3. 🔄 **Undo/Redo Changes**
+4. 📸 **Project Snapshots**
+5. 🔗 **GitHub Integration**
+6. 🎨 **Custom Themes**
+7. 🌐 **Multi-language Support**
+
+### 🛠️ How to Contribute
+
+Want to help build these features? Check out our [Contributing Guide](CONTRIBUTING.md)!
 
 ---
+
 
 <p align="center">
   Made with ❤️ by <a href="https://github.com/abuabbasit">Mohamed Abu Basith</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/abuabbasit/coding-agent-plugin">⭐ Star us on GitHub</a> • 
-  <a href="https://pypi.org/project/coding-agent-plugin/">📦 Install from PyPI</a>
+  <a href="https://github.com/abuabbasit/agentic-coder">⭐ Star us on GitHub</a> • 
+  <a href="https://pypi.org/project/agentic-coder/">📦 Install from PyPI</a>
 </p>

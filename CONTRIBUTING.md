@@ -38,8 +38,8 @@ Enhancement suggestions are welcome! Please:
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/coding-agent-plugin.git
-cd coding-agent-plugin
+git clone https://github.com/YOUR_USERNAME/agentic-coder.git
+cd agentic-coder
 
 # Create virtual environment
 python3 -m venv venv

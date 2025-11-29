@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "coding-agent-plugin"  # Must be unique on PyPI
+name = "agentic-coder"  # Must be unique on PyPI
 version = "0.1.0"
-description = "Multi-agent coding assistant with orchestration, planning, and execution capabilities"
+description = "AI-powered autonomous project creator and iterative developer"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -15,17 +15,17 @@ authors = [
 maintainers = [
     { name = "Mohamed Abu Basith", email = "your.email@example.com" }
 ]
-keywords = ["ai", "coding-agent", "llm", "multi-agent", "code-generation", "orchestration"]
+keywords = ["ai", "coding-agent", "llm", "agentic", "autonomous", "code-generation", "project-creator"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Build Tools",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Code Generators",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
 dependencies = [

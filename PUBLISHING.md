@@ -14,7 +14,7 @@ Ensure all metadata is correct:
 
 ```toml
 [project]
-name = "coding-agent-plugin"
+name = "agentic-coder"
 version = "0.1.0"  # Update this for each release
 description = "AI-powered project creator and iterative developer"
 readme = "README.md"
@@ -27,9 +27,9 @@ keywords = ["ai", "coding-agent", "llm", "autonomous-agent", "code-generation"]
 
 # Update URLs
 [project.urls]
-Homepage = "https://github.com/abuabbasit/coding-agent-plugin"
-Repository = "https://github.com/abuabbasit/coding-agent-plugin"
-Issues = "https://github.com/abuabbasit/coding-agent-plugin/issues"
+Homepage = "https://github.com/abuabbasit/agentic-coder"
+Repository = "https://github.com/abuabbasit/agentic-coder"
+Issues = "https://github.com/abuabbasit/agentic-coder/issues"
 ```
 
 ### 1.2 Create Required Files
@@ -83,7 +83,7 @@ python3 -m build
 ```
 
 This creates:
-- `dist/coding-agent-plugin-0.1.0.tar.gz` (source distribution)
+- `dist/agentic-coder-0.1.0.tar.gz` (source distribution)
 - `dist/coding_agent_plugin-0.1.0-py3-none-any.whl` (wheel)
 
 ### 2.4 Verify the Build
@@ -109,19 +109,19 @@ You'll be prompted for:
 ### 3.2 Test Installation
 
 ```bash
-pip install -i https://test.pypi.org/simple/ coding-agent-plugin
+pip install -i https://test.pypi.org/simple/ agentic-coder
 ```
 
 ### 3.3 Verify it Works
 
 ```bash
-coding-agent --help
+agentic-coder --help
 ```
 
 ### 3.4 Uninstall Test Version
 
 ```bash
-pip uninstall coding-agent-plugin
+pip uninstall agentic-coder
 ```
 
 ## Step 4: Publish to PyPI
@@ -138,13 +138,13 @@ You'll be prompted for:
 
 ### 4.2 Verify on PyPI
 
-Visit: https://pypi.org/project/coding-agent-plugin/
+Visit: https://pypi.org/project/agentic-coder/
 
 ## Step 5: Test Real Installation
 
 ```bash
-pip install coding-agent-plugin
-coding-agent --help
+pip install agentic-coder
+agentic-coder --help
 ```
 
 ## Step 6: Create GitHub Release
@@ -158,7 +158,7 @@ git push origin v0.1.0
 
 ### 6.2 Create GitHub Release
 
-1. Go to https://github.com/abuabbasit/coding-agent-plugin/releases/new
+1. Go to https://github.com/abuabbasit/agentic-coder/releases/new
 2. Select tag `v0.1.0`
 3. Title: `v0.1.0 - Initial Release`
 4. Description: Copy from CHANGELOG.md
@@ -237,7 +237,7 @@ jobs:
 **Solution:** Check `[project.scripts]` in `pyproject.toml`:
 ```toml
 [project.scripts]
-coding-agent = "coding_agent_plugin.cli.main:app"
+agentic-coder = "coding_agent_plugin.cli.main:app"
 ```
 
 ## Best Practices
@@ -257,16 +257,16 @@ coding-agent = "coding_agent_plugin.cli.main:app"
 python -m build --no-isolation && twine check dist/*
 
 # View package details
-pip show coding-agent-plugin
+pip show agentic-coder
 
 # List files in package
-tar -tzf dist/coding-agent-plugin-*.tar.gz
+tar -tzf dist/agentic-coder-*.tar.gz
 
 # Uninstall
-pip uninstall coding-agent-plugin
+pip uninstall agentic-coder
 
 # Install specific version
-pip install coding-agent-plugin==0.1.0
+pip install agentic-coder==0.1.0
 ```
 
 ## PyPI Package Status Badges
@@ -274,9 +274,9 @@ pip install coding-agent-plugin==0.1.0
 Add to README.md:
 
 ```markdown
-[![PyPI version](https://img.shields.io/pypi/v/coding-agent-plugin)](https://pypi.org/project/coding-agent-plugin/)
-[![Downloads](https://img.shields.io/pypi/dm/coding-agent-plugin)](https://pypi.org/project/coding-agent-plugin/)
-[![Python Versions](https://img.shields.io/pypi/pyversions/coding-agent-plugin)](https://pypi.org/project/coding-agent-plugin/)
+[![PyPI version](https://img.shields.io/pypi/v/agentic-coder)](https://pypi.org/project/agentic-coder/)
+[![Downloads](https://img.shields.io/pypi/dm/agentic-coder)](https://pypi.org/project/agentic-coder/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/agentic-coder)](https://pypi.org/project/agentic-coder/)
 ```
 
 ## Maintaining the Package

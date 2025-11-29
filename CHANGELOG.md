@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned for v0.2.0
+- **MCP Server Integration**: Connect custom Model Context Protocol servers for extended capabilities
+- **Project Templates**: Pre-built templates for FastAPI, Next.js, React, Django, Flask, Express
+- **Cost Tracking**: Monitor and control LLM costs with budgets
+- **Undo/Redo**: Revert changes easily
+- **GitHub Integration**: Direct integration with GitHub repositories
+
+### Under Consideration
+- Web UI for visual project creation
+- Automatic test generation
+- Code review agent
+- Multi-agent collaboration
+- IDE extensions (VS Code, JetBrains, Vim)
+- Multi-language support
+- Cloud deployment integration
+
 ## [0.1.0] - 2024-11-29
 
 ### Added
@@ -63,4 +79,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - python-dotenv >= 1.0.0
 - pydantic >= 2.8.0
 
-[0.1.0]: https://github.com/abuabbasit/coding-agent-plugin/releases/tag/v0.1.0
+[0.1.0]: https://github.com/abuabbasit/agentic-coder/releases/tag/v0.1.0

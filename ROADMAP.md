@@ -16,16 +16,16 @@
 **Features:**
 ```bash
 # Install globally
-pip install coding-agent-plugin
+pip install agentic-coder
 
 # Simple usage
-coding-agent create "FastAPI login backend" --output ./my-project
+agentic-coder create "FastAPI login backend" --output ./my-project
 
 # Interactive mode
-coding-agent init  # Asks questions, then creates project
+agentic-coder init  # Asks questions, then creates project
 
 # With options
-coding-agent create "React Todo App" \
+agentic-coder create "React Todo App" \
   --framework react \
   --backend fastapi \
   --db postgresql \
@@ -109,12 +109,12 @@ Tokens: 2,450 | Cost: $0.03
 **Features:**
 ```bash
 # List templates
-coding-agent templates
+agentic-coder templates
 
 # Use template
-coding-agent create --template nextjs-auth my-app
-coding-agent create --template fastapi-crud my-api
-coding-agent create --template django-blog my-blog
+agentic-coder create --template nextjs-auth my-app
+agentic-coder create --template fastapi-crud my-api
+agentic-coder create --template django-blog my-blog
 ```
 
 **Built-in Templates:**
@@ -136,7 +136,7 @@ coding-agent create --template django-blog my-blog
 
 **Features:**
 ```bash
-coding-agent create "My App" --git  # Auto-init git repo
+agentic-coder create "My App" --git  # Auto-init git repo
 ```
 
 **Auto-commits:**
@@ -217,10 +217,10 @@ pip install -r requirements.txt
 **Features:**
 ```bash
 # Set budget
-coding-agent create "My App" --max-cost 0.50  # Stop at $0.50
+agentic-coder create "My App" --max-cost 0.50  # Stop at $0.50
 
 # Show costs
-coding-agent stats show
+agentic-coder stats show
 ```
 
 **Display:**
@@ -250,17 +250,17 @@ Breakdown:
 **Features:**
 ```bash
 # Create profile
-coding-agent config create my-profile \
+agentic-coder config create my-profile \
   --model qwen/qwen3-next-80b-a3b-instruct \
   --provider nvidia \
   --max-cost 1.00 \
   --framework fastapi
 
 # Use profile
-coding-agent create "Login API" --profile my-profile
+agentic-coder create "Login API" --profile my-profile
 
 # List profiles
-coding-agent config list
+agentic-coder config list
 ```
 
 **Stored in:** `~/.coding-agent/profiles.yml`
@@ -338,13 +338,13 @@ orchestrator.register_agent("custom", MyCustomAgent())
 **Features:**
 ```bash
 # Undo last operation
-coding-agent undo
+agentic-coder undo
 
 # Rollback to checkpoint
-coding-agent rollback --to planning
+agentic-coder rollback --to planning
 
 # Show history
-coding-agent history
+agentic-coder history
 ```
 
 ---
@@ -365,7 +365,7 @@ coding-agent history
 
 **Features:**
 ```bash
-coding-agent create "My App" --dry-run
+agentic-coder create "My App" --dry-run
 # Shows plan, estimated cost, estimated time
 # No actual code generation
 ```
