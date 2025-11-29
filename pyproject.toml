@@ -53,10 +53,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/coding-agent-plugin"
-Documentation = "https://github.com/yourusername/coding-agent-plugin#readme"
-Repository = "https://github.com/yourusername/coding-agent-plugin"
-Issues = "https://github.com/yourusername/coding-agent-plugin/issues"
+Homepage = "https://github.com/mohamedabubasith/coding-agent"
+Documentation = "https://github.com/mohamedabubasith/coding-agent#readme"
+Repository = "https://github.com/mohamedabubasith/coding-agent"
+Issues = "https://github.com/mohamedabubasith/coding-agent/issues"
 
 [project.scripts]
 coding-agent = "coding_agent_plugin.cli.main:app"

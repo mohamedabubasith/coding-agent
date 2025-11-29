@@ -27,9 +27,9 @@ keywords = ["ai", "coding-agent", "llm", "autonomous-agent", "code-generation"]
 
 # Update URLs
 [project.urls]
-Homepage = "https://github.com/abuabbasit/agentic-coder"
-Repository = "https://github.com/abuabbasit/agentic-coder"
-Issues = "https://github.com/abuabbasit/agentic-coder/issues"
+Homepage = "https://github.com/mohamedabubasith/coding-agent"
+Repository = "https://github.com/mohamedabubasith/coding-agent"
+Issues = "https://github.com/mohamedabubasith/coding-agent/issues"
 ```
 
 ### 1.2 Create Required Files
@@ -158,7 +158,7 @@ git push origin v0.1.0
 
 ### 6.2 Create GitHub Release
 
-1. Go to https://github.com/abuabbasit/agentic-coder/releases/new
+1. Go to https://github.com/mohamedabubasith/coding-agent/releases/new
 2. Select tag `v0.1.0`
 3. Title: `v0.1.0 - Initial Release`
 4. Description: Copy from CHANGELOG.md

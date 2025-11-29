@@ -79,4 +79,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - python-dotenv >= 1.0.0
 - pydantic >= 2.8.0
 
-[0.1.0]: https://github.com/abuabbasit/agentic-coder/releases/tag/v0.1.0
+[0.1.0]: https://github.com/mohamedabubasith/coding-agent/releases/tag/v0.1.0
