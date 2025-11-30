@@ -10,8 +10,9 @@ class TaskAgent(BaseAgent):
 
     def __init__(self, name: str = "task", model: str = None):
         super().__init__(name, model)
-        from coding_agent_plugin.managers import ProjectManager
-        self.pm = ProjectManager()
+        super().__init__(name, model)
+        from coding_agent_plugin.services.project import project_service
+        self.project_service = project_service
 
     async def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Execute task management operations."""
@@ -23,11 +24,11 @@ class TaskAgent(BaseAgent):
 
         if action == "init_tasks":
             tasks_list = task.get("tasks", [])
-            return self.init_tasks(project_id, tasks_list)
+            return await self.init_tasks(project_id, tasks_list)
         elif action == "update_status":
             task_desc = task.get("task_description")
             status = task.get("status", "completed")
-            return self.update_task_status(project_id, task_desc, status)
+            return await self.update_task_status(project_id, task_desc, status)
         else:
             # Default/Legacy behavior: just log
             user_prompt = task.get("user_prompt")
@@ -37,21 +38,23 @@ class TaskAgent(BaseAgent):
                 return {"status": "logged"}
             return {"status": "no_action"}
 
-    def _get_tasks_file(self, project_id: str) -> Path:
+    async def _get_tasks_file(self, project_id: str) -> Path:
         """Resolve tasks.md path."""
         from pathlib import Path
-        project = self.pm.get_project(project_id)
-        if not project:
-            raise ValueError(f"Project {project_id} not found")
-            
-        context_dir = Path(project['storage_path']) / ".agentic"
+        try:
+            project = await self.project_service.get_project(project_id)
+        except Exception:
+             # Fallback or error
+             raise ValueError(f"Project {project_id} not found")
+             
+        context_dir = Path(project.storage_path) / ".agentic"
         context_dir.mkdir(parents=True, exist_ok=True)
         return context_dir / "tasks.md"
 
-    def init_tasks(self, project_id: str, tasks: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def init_tasks(self, project_id: str, tasks: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Initialize tasks.md with the plan."""
         try:
-            file_path = self._get_tasks_file(project_id)
+            file_path = await self._get_tasks_file(project_id)
             
             with open(file_path, "w") as f:
                 f.write("# Project Tasks\n\n")
@@ -66,10 +69,10 @@ class TaskAgent(BaseAgent):
             self.log(f"Failed to init tasks: {e}")
             return {"status": "error", "error": str(e)}
 
-    def update_task_status(self, project_id: str, task_desc: str, status: str) -> Dict[str, Any]:
+    async def update_task_status(self, project_id: str, task_desc: str, status: str) -> Dict[str, Any]:
         """Mark a task as completed in tasks.md."""
         try:
-            file_path = self._get_tasks_file(project_id)
+            file_path = await self._get_tasks_file(project_id)
             if not file_path.exists():
                 return {"status": "error", "error": "tasks.md not found"}
             

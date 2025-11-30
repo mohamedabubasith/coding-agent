@@ -25,9 +25,10 @@ class ProjectUpdate(BaseModel):
 class ProjectResponse(BaseModel):
     """Model for project response."""
 
-    id: int
+    id: str
     project_name: str
     description: str | None
+    storage_path: str
     config: dict[str, Any]
     created_at: datetime
     updated_at: datetime

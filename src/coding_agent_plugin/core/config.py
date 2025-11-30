@@ -22,6 +22,9 @@ AGENT_RETRY_DELAY = int(os.getenv("AGENT_RETRY_DELAY", "2"))  # Seconds
 # Project Configuration
 AGENTIC_PROJECTS_DIR = os.getenv("AGENTIC_PROJECTS_DIR", str(Path.home() / ".agentic-coder" / "projects"))
 
+# Backend Configuration
+BACKEND_SERVER_REQUIRED: bool = os.getenv("BACKEND_SERVER_REQUIRED", "false").lower() == "true"
+
 
 def validate_llm_config():
     """Validate that LLM configuration is present."""

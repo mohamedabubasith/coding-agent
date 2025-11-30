@@ -83,13 +83,17 @@ class OrchestratorAgent:
         results = []
         MAX_RETRIES = 2
         
-        from coding_agent_plugin.managers import ProjectManager
-        pm = ProjectManager()
-        project = pm.get_project(project_id)
-        if not project:
-            raise ValueError(f"Project '{project_id}' not found")
-            
-        project_path = project['storage_path']
+        from coding_agent_plugin.services.project import project_service
+        
+        # Get project details using service
+        try:
+            project = await project_service.get_project(project_id)
+        except Exception:
+            # Fallback: try by name if ID fails (though run_project usually gets ID)
+            # Or handle error appropriately
+             raise ValueError(f"Project '{project_id}' not found")
+
+        project_path = project.storage_path
         
         for i, task in enumerate(tasks, 1):
             description = task.get("description")
