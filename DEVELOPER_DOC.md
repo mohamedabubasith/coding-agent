@@ -442,7 +442,7 @@ sm.delete_file("my-api", "src/main.py")
 
 ### Command Structure
 
-**Framework**: Click (command-line framework)
+**Framework**: Typer (command-line framework)
 
 **Main Commands**:
 
@@ -456,51 +456,26 @@ Creates:
 - SQLite database
 - Projects directory
 
-#### 2. `create`
-Generate a new project:
+#### 2. `project create`
+Create a new project entry:
 ```bash
-agentic-coder create "FastAPI backend with JWT auth" --project my-api
+agentic-coder project create "my-api"
 ```
 
-Options:
-- `--project`: Target project (required or uses current)
-- `--model`: Override LLM model
-- `--interactive`: Review plan before generation
-- `--git/--no-git`: Git initialization
-
-#### 3. `improve`
-Iteratively improve existing project:
+#### 3. `project run`
+Execute agent tasks on a project (Autonomous or Direct):
 ```bash
-agentic-coder improve "add type hints" --project my-api
+# Autonomous Mode (Planning -> Coding -> Verification)
+agentic-coder project run "Create Login API" --mode autonomous
+
+# Direct Mode (Single file edit)
+agentic-coder project run "Fix bug in auth.py" --mode direct --file app/auth.py
 ```
 
-Options:
-- `--file`: Target specific file
-- `--interactive`: Interactive session
-- `--dry-run`: Preview changes
-
-#### 4. `project create`
-Create a new project:
-```bash
-agentic-coder project create "my-dashboard" --description "React dashboard"
-```
-
-#### 5. `project list`
+#### 4. `project list`
 List all projects:
 ```bash
 agentic-coder project list
-```
-
-#### 6. `project switch`
-Switch active project:
-```bash
-agentic-coder project switch my-api
-```
-
-#### 7. `project delete`
-Delete a project:
-```bash
-agentic-coder project delete my-api --yes
 ```
 
 #### 8. `project info`

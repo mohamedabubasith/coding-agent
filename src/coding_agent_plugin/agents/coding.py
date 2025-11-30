@@ -45,7 +45,7 @@ class CodingAgent(BaseAgent):
         if not project:
             raise ValueError(f"Project '{project_id}' not found")
             
-        project_path = project.storage_path
+        project_path = project['storage_path']
         
         existing_content = None
         if file_path_relative:

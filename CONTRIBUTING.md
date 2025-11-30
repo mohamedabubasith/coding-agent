@@ -52,8 +52,7 @@ pip install -e ".[dev]"
 pytest
 
 # Run CLI locally
-export PYTHONPATH=$PYTHONPATH:$(pwd)/src
-python3 -m coding_agent_plugin.cli.main --help
+agentic-coder --help
 ```
 
 ## Code Style

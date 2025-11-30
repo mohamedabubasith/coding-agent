@@ -126,7 +126,7 @@ class ProjectManager:
             projects = session.query(Project).order_by(Project.created_at.desc()).all()
             return [p.to_dict() for p in projects]
     
-    def get_project(self, name_or_id: str) -> Optional[Project]:
+    def get_project(self, name_or_id: str) -> Optional[Dict]:
         """
         Get project by name or ID.
         
@@ -134,21 +134,19 @@ class ProjectManager:
             name_or_id: Project name or ID
             
         Returns:
-            Project object or None if not found
+            Project dictionary or None if not found
         """
         with get_db_session() as session:
             # Try by name first
             project = session.query(Project).filter_by(name=name_or_id).first()
             if project:
-                # Detach from session
-                session.expunge(project)
-                return project
+                return project.to_dict()
             
             # Try by ID
             project = session.query(Project).filter_by(id=name_or_id).first()
             if project:
-                session.expunge(project)
-            return project
+                return project.to_dict()
+            return None
     
     def delete_project(self, name_or_id: str) -> bool:
         """

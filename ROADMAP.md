@@ -7,6 +7,9 @@
 - ✅ Support for multiple LLM providers (OpenAI, NVIDIA, etc.)
 - ✅ Context-aware coding
 - ✅ Hidden internal files
+- ✅ CLI Interface (init, project create, project run)
+- ✅ Git Integration (Auto-init)
+- ✅ Iterative Development (Follow-up tasks)
 
 ## User Experience Improvements
 
