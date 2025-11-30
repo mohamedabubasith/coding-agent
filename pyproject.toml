@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "agentic-coder"  # Must be unique on PyPI
-version = "0.4.0"
+dynamic = ["version"]
 description = "AI-powered autonomous project creator and iterative developer"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -84,4 +84,7 @@ addopts = [
     "--strict-markers",
     "--disable-warnings"
 ]
+
+[tool.hatch.version]
+source = "vcs"
 
