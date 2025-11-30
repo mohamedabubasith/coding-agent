@@ -34,10 +34,26 @@ class ErrorAgent(BaseAgent):
 
         self.log(f"Fixing errors for project: {project_id}")
         
-        file_path = os.path.join(f"projects/{project_id}", "generated_code.py")
+        # Resolve project path
+        from coding_agent_plugin.managers import ProjectManager
+        pm = ProjectManager()
+        project = pm.get_project(project_id)
+        if not project:
+            raise ValueError(f"Project '{project_id}' not found")
+            
+        project_path = project['storage_path']
+        
+        # Determine file to fix
+        file_path_relative = task.get("file_path")
+        if not file_path_relative:
+             # If no specific file provided, we might need to infer or fail
+             # For now, let's try to find 'generated_code.py' as fallback, or fail
+             file_path_relative = "generated_code.py"
+             
+        file_path = os.path.join(project_path, file_path_relative)
         
         if not os.path.exists(file_path):
-             return {"status": "error", "message": "File not found"}
+             return {"status": "error", "message": f"File not found: {file_path}"}
              
         with open(file_path, "r") as f:
             code_content = f.read()

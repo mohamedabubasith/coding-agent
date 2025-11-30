@@ -51,8 +51,20 @@ class FileModifierAgent(BaseAgent):
         # Generate modified content
         modified_content = await self.modify_file(instruction, existing_content, file_path)
         
+        # Resolve project path
+        from coding_agent_plugin.managers import ProjectManager
+        pm = ProjectManager()
+        project = pm.get_project(project_id)
+        if not project:
+            # Fallback for direct mode or testing if project not found in DB but exists on disk
+            # But ideally we should use PM.
+            # If project_id is just a name, get_project handles it.
+            pass
+            
+        base_path = project['storage_path'] if project else f"projects/{project_id}"
+        
         # Save modified file
-        full_path = os.path.join(f"projects/{project_id}", file_path)
+        full_path = os.path.join(base_path, file_path)
         os.makedirs(os.path.dirname(full_path), exist_ok=True)
         
         with open(full_path, 'w') as f:

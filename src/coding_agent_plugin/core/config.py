@@ -22,18 +22,28 @@ AGENT_RETRY_DELAY = int(os.getenv("AGENT_RETRY_DELAY", "2"))  # Seconds
 # Project Configuration
 AGENTIC_PROJECTS_DIR = os.getenv("AGENTIC_PROJECTS_DIR", str(Path.home() / ".agentic-coder" / "projects"))
 
-def validate_llm_config() -> None:
-    """
-    Validate that required LLM configuration is present.
-    
-    Raises:
-        ValueError: If LLM_API_KEY is missing
-    """
+
+def validate_llm_config():
+    """Validate that LLM configuration is present."""
+    missing = []
     if not LLM_API_KEY:
+        missing.append("LLM_API_KEY")
+    if not LLM_MODEL:
+        missing.append("LLM_MODEL")
+    if not LLM_BASE_URL:
+        # LLM_BASE_URL might be optional depending on provider, but user requested it to be required
+        missing.append("LLM_BASE_URL")
+        
+    if missing:
         raise ValueError(
-            "LLM_API_KEY is required but not set.\n\n"
-            "Please set it in your .env file:\n"
-            "  LLM_API_KEY=your_api_key_here\n\n"
-            "Or export it as an environment variable:\n"
-            "  export LLM_API_KEY=your_api_key_here"
+            f"Missing required environment variables for LLM: {', '.join(missing)}\n"
+            "Please set them in your .env file or environment."
+        )
+
+def validate_db_config():
+    """Validate that Database configuration is present."""
+    if not DATABASE_URL:
+        raise ValueError(
+            "Missing required environment variable: DATABASE_URL\n"
+            "Please set it in your .env file or environment."
         )

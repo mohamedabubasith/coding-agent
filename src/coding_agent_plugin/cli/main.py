@@ -752,8 +752,15 @@ def init():
     """Initialize agentic-coder (first-time setup)."""
     from coding_agent_plugin.models import init_db
     from coding_agent_plugin.models.database import AGENTIC_HOME
+    from coding_agent_plugin.core.config import validate_db_config
     
     console.print("\n[bold cyan]🚀 Initializing Agentic Coder...[/bold cyan]\n")
+    
+    try:
+        validate_db_config()
+    except ValueError as e:
+        console.print(f"[red]❌ Configuration Error:[/red]\n{e}")
+        return
     
     # Create home directory
     AGENTIC_HOME.mkdir(parents=True, exist_ok=True)

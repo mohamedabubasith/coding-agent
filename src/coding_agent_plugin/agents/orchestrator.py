@@ -152,6 +152,7 @@ class OrchestratorAgent:
                         try:
                             error_agent = self.agents["error"]
                             error_task_input = {
+                                "user_prompt": f"Fix error in {task_input.get('file_path')}: {str(e)}",
                                 "error": str(e),
                                 "file_path": task_input.get("file_path"), # Might be None
                                 "project_id": project_id,

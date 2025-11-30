@@ -34,10 +34,15 @@ class ExecutionAgent(BaseAgent):
             self.log(f"Running command: {command} in {cwd}")
             result = await self.run_command(command, cwd=cwd)
         else:
-            # Default behavior: run generated_code.py
-            file_path = os.path.join(cwd, "generated_code.py")
+            # Run specific file
+            file_path_relative = task.get("file_path")
+            if not file_path_relative:
+                # Fallback
+                file_path_relative = "generated_code.py"
+                
+            file_path = os.path.join(cwd, file_path_relative)
             if not os.path.exists(file_path):
-                 return {"status": "error", "message": "File not found"}
+                 return {"status": "error", "message": f"File not found: {file_path}"}
             result = await self.run_code(file_path)
             
         log_path = self.log_execution(project_id, result)
