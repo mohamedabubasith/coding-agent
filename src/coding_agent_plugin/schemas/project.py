@@ -1,38 +1,70 @@
-"""SQLAlchemy database schemas."""
+"""SQLAlchemy database models for agentic-coder."""
 
-from datetime import datetime, timezone
-from typing import Any
-from sqlalchemy import Column, String, DateTime, Text, JSON, Integer
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import Column, String, Integer, Text, DateTime, JSON, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
+from datetime import datetime
+import uuid
 
-
-class Base(DeclarativeBase):
-    """Base class for all database models."""
-
-    pass
+Base = declarative_base()
 
 
-class ProjectSchema(Base):
-    """Database schema for projects."""
+class Project(Base):
+    """Project model for database storage."""
+    
+    __tablename__ = "projects"
+    
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = Column(String, unique=True, nullable=False, index=True)
+    description = Column(Text)
+    storage_path = Column(String, nullable=False)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    project_metadata = Column(JSON, default=dict)
+    
+    def to_dict(self):
+        """Convert to dictionary."""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "storage_path": self.storage_path,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "project_metadata": self.project_metadata or {}
+        }
 
-    __tablename__: str = "projects"
 
-    id: Column[int] = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    project_name: Column[str] = Column(String(length=255), nullable=False, index=True)
-    description: Column[str] = Column(Text, nullable=True)
-    config: Column[Any] = Column(JSON, nullable=False, default=dict)
-    created_at: Column[datetime] = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        default=lambda: datetime.now(tz=timezone.utc),
-    )
-    updated_at: Column[datetime] = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        default=lambda: datetime.now(tz=timezone.utc),
-        onupdate=lambda: datetime.now(tz=timezone.utc),
-    )
-    status: Column[str] = Column(String(length=50), nullable=False, default="active")
+class ProjectFile(Base):
+    """Project file tracking model."""
+    
+    __tablename__ = "project_files"
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    file_path = Column(String, nullable=False)
+    content_hash = Column(String)
+    size_bytes = Column(Integer)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
-    def __repr__(self) -> str:
-        return f"<ProjectSchema(id={self.id}, name='{self.project_name}')>"
+
+class ProjectVersion(Base):
+    """Project version history model."""
+    
+    __tablename__ = "project_versions"
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    version = Column(String, nullable=False)
+    commit_hash = Column(String)
+    created_at = Column(DateTime, default=func.now())
+
+
+class UserSettings(Base):
+    """User settings storage model."""
+    
+    __tablename__ = "user_settings"
+    
+    key = Column(String, primary_key=True)
+    value = Column(Text, nullable=False)

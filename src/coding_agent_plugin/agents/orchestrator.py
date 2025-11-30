@@ -89,7 +89,7 @@ class OrchestratorAgent:
         if not project:
             raise ValueError(f"Project '{project_id}' not found")
             
-        project_path = project.storage_path
+        project_path = project['storage_path']
         
         for i, task in enumerate(tasks, 1):
             description = task.get("description")

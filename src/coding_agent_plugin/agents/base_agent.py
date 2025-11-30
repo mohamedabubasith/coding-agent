@@ -10,6 +10,8 @@ class BaseAgent(ABC):
     def __init__(self, name: str, openapi_instance: Any = None):
         self.name = name
         self.openapi_instance = openapi_instance
+        from coding_agent_plugin.managers.audit_manager import AuditManager
+        self.audit = AuditManager()
 
     @abstractmethod
     async def execute(self, task: Any) -> Dict[str, Any]:

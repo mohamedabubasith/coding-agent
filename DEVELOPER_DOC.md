@@ -334,6 +334,29 @@ class BaseAgent(ABC):
 
 **Key Method**: `run_project(prompt, project_id)`
 
+### 8. Context Awareness & File Handling
+
+One of the most critical aspects of the agent system is how it understands existing code.
+
+**How Agents Know About Existing Files:**
+
+1.  **Planning Phase**:
+    *   The `PlanningAgent` calls `ProjectManager.list_files(project_id)` to get a list of all existing files.
+    *   This file list is injected into the system prompt as `Existing Project Files`.
+    *   The LLM uses this to avoid creating duplicate files and to understand the current project structure.
+    *   *Note: The planner typically sees file NAMES, not full contents, to keep context size manageable.*
+
+2.  **Coding Phase**:
+    *   When the `CodingAgent` is assigned a task (e.g., "Update auth.py"), it performs two checks:
+        *   **Target File**: It reads the content of the specific file it is meant to edit (if it exists).
+        *   **Project Context**: It retrieves the list of *all* other files in the project to understand the overall structure.
+    *   This allows the agent to import correct modules and maintain consistency.
+
+3.  **"Reading Code Flow"**:
+    *   Currently, the agents do **not** automatically read the full content of *every* file in the project before every task (this would be too expensive and slow).
+    *   **Selective Context**: They rely on the file list for structure and read specific file contents only when directed to work on them.
+    *   **Future Improvement**: A "Context Agent" or RAG (Retrieval-Augmented Generation) system could be added to intelligently fetch relevant code snippets from other files.
+
 ---
 
 ## Project Management

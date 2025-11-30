@@ -37,6 +37,12 @@ class CodingAgent(BaseAgent):
         if not user_prompt or not project_id:
             raise ValueError("Missing user_prompt or project_id")
 
+        await self.audit.log_event(
+            event_type="coding_start",
+            data={"user_prompt": user_prompt, "file_path": file_path_relative},
+            project_id=project_id
+        )
+
         self.log(f"Generating code for: {user_prompt}")
         
         # Get project storage path
@@ -57,13 +63,19 @@ class CodingAgent(BaseAgent):
         # Get all project files for context
         project_files = pm.list_files(project_id)
         
-        code_content = await self.generate_code(user_prompt, existing_content, project_files)
+        code_content = await self.generate_code(user_prompt, existing_content, project_files, project_id)
         
         saved_path = self.save_code(project_id, code_content, file_path_relative)
         
+        await self.audit.log_event(
+            event_type="coding_complete",
+            data={"file_path": saved_path, "code_length": len(code_content)},
+            project_id=project_id
+        )
+        
         return {"file_path": saved_path, "code": code_content}
 
-    async def generate_code(self, prompt: str, existing_content: str | None = None, project_files: list[str] = None) -> str:
+    async def generate_code(self, prompt: str, existing_content: str | None = None, project_files: list[str] = None, project_id: str = None) -> str:
         """Generate code using LLM."""
         from coding_agent_plugin.services.prompt_service import PromptService
         
@@ -81,6 +93,17 @@ class CodingAgent(BaseAgent):
         ]
         
         response = await self.retry_operation(self.model.ainvoke, messages)
+        
+        # Log token usage if available
+        if hasattr(response, "response_metadata") and project_id:
+            token_usage = response.response_metadata.get("token_usage", {})
+            if token_usage:
+                await self.audit.log_event(
+                    event_type="llm_usage",
+                    data={"token_usage": token_usage, "model": self.model.model_name},
+                    project_id=project_id
+                )
+
         raw_content = response.content
         
         # Log the raw response for debugging
@@ -114,7 +137,7 @@ class CodingAgent(BaseAgent):
         project = pm.get_project(project_id)
         
         if project:
-            directory = project.storage_path
+            directory = project['storage_path']
         else:
             # Fallback for legacy/test
             directory = os.path.abspath(f"projects/{project_id}")

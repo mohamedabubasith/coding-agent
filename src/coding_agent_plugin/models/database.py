@@ -7,7 +7,7 @@ from pathlib import Path
 from contextlib import contextmanager
 import os
 
-from coding_agent_plugin.models.db_models import Base
+from coding_agent_plugin.schemas.project import Base
 
 
 # Database configuration
@@ -17,9 +17,11 @@ DATABASE_PATH = AGENTIC_HOME / "data.db"
 # Ensure directory exists
 AGENTIC_HOME.mkdir(parents=True, exist_ok=True)
 
+DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+
 # Create engine
 engine = create_engine(
-    f"sqlite:///{DATABASE_PATH}",
+    DATABASE_URL,
     connect_args={"check_same_thread": False},
     poolclass=StaticPool,
     echo=False
@@ -31,6 +33,10 @@ SessionLocal = scoped_session(sessionmaker(autocommit=False, autoflush=False, bi
 
 def init_db():
     """Initialize database tables."""
+    # Import all models to ensure they are registered with Base
+    from coding_agent_plugin.schemas.project import Project, ProjectFile, ProjectVersion, UserSettings
+    from coding_agent_plugin.schemas.audit import AuditLog
+    
     Base.metadata.create_all(bind=engine)
 
 

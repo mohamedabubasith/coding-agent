@@ -100,7 +100,7 @@ class BenchmarkRunner:
             # Also need to handle if project already exists (cleanup from previous run)
             existing = pm.get_project(case['name'])
             if existing:
-                pm.delete_project(existing.id)
+                pm.delete_project(existing['id'])
                 
             project_data = pm.create_project(name=case['name'], description=f"Benchmark: {case['name']}")
             project_id = project_data['id']

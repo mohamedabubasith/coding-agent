@@ -34,6 +34,12 @@ class PlanningAgent(BaseAgent):
         if not user_prompt or not project_id:
             raise ValueError("Missing user_prompt or project_id")
 
+        await self.audit.log_event(
+            event_type="planning_start",
+            data={"user_prompt": user_prompt},
+            project_id=project_id
+        )
+
         self.log(f"Executing planning task: {user_prompt}")
         
         # Get existing files
@@ -42,6 +48,12 @@ class PlanningAgent(BaseAgent):
         workflow = await self.plan(user_prompt, existing_files)
         
         self.save_plan(project_id, workflow)
+        
+        await self.audit.log_event(
+            event_type="planning_complete",
+            data={"workflow_tasks": len(workflow.get("tasks", []))},
+            project_id=project_id
+        )
         
         return {"workflow": workflow}
 
@@ -103,7 +115,7 @@ IMPORTANT GUIDELINES FOR EXISTING PROJECTS:
             self.log(f"Project {project_id} not found, cannot save plan")
             return
             
-        storage_path = Path(project.storage_path)
+        storage_path = Path(project['storage_path'])
         context_dir = storage_path / ".agentic"
         context_dir.mkdir(parents=True, exist_ok=True)
         

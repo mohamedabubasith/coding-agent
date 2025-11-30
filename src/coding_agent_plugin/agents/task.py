@@ -44,7 +44,7 @@ class TaskAgent(BaseAgent):
         if not project:
             raise ValueError(f"Project {project_id} not found")
             
-        context_dir = Path(project.storage_path) / ".agentic"
+        context_dir = Path(project['storage_path']) / ".agentic"
         context_dir.mkdir(parents=True, exist_ok=True)
         return context_dir / "tasks.md"
 

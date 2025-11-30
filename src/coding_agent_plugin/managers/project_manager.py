@@ -32,7 +32,7 @@ class ProjectManager:
         if not project:
             return []
             
-        base_path = Path(project.storage_path) # Access storage_path directly from Project object
+        base_path = Path(project['storage_path']) # Access storage_path directly from Project dict
         if not base_path.exists():
             return []
             
@@ -208,9 +208,9 @@ class ProjectManager:
             # Update or create current_project setting
             setting = session.query(UserSettings).filter_by(key="current_project").first()
             if setting:
-                setting.value = project.name
+                setting.value = project['name']
             else:
-                setting = UserSettings(key="current_project", value=project.name)
+                setting = UserSettings(key="current_project", value=project['name'])
                 session.add(setting)
             
             return True
@@ -229,7 +229,7 @@ class ProjectManager:
         if not project:
             return None
         
-        storage_path = Path(project.storage_path)
+        storage_path = Path(project['storage_path'])
         
         # Count files and calculate total size
         file_count = 0
@@ -242,7 +242,7 @@ class ProjectManager:
                     total_size += file.stat().st_size
         
         return {
-            **project.to_dict(),
+            **project,
             "file_count": file_count,
             "total_size_bytes": total_size,
             "total_size_mb": round(total_size / (1024 * 1024), 2)
