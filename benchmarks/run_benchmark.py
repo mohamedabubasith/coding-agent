@@ -43,28 +43,90 @@ BENCHMARK_CASES = [
         "category": "Scripting",
         "difficulty": "Easy",
         "prompt": "Create a python script that calculates the Fibonacci sequence up to the 100th number and saves it to 'fib.txt'.",
-        "expected_files": ["fib.py"]
+        "validation": {
+            "extensions": [".py"],
+            "min_files": 1
+        }
     },
     {
         "name": "FastAPI CRUD",
         "category": "Backend",
         "difficulty": "Medium",
         "prompt": "Create a FastAPI application with a 'Book' model (title, author, year). Implement Create, Read, Update, Delete endpoints. Use SQLite.",
-        "expected_files": ["main.py", "models.py", "requirements.txt"]
+        "validation": {
+            "extensions": [".py", ".txt"],
+            "min_files": 3
+        }
     },
     {
         "name": "React Counter",
         "category": "Frontend",
         "difficulty": "Medium",
         "prompt": "Create a React component 'Counter.js' that has increment/decrement buttons and displays the count. Add a 'Reset' button too.",
-        "expected_files": ["Counter.js"]
+        "validation": {
+            "extensions": [".js", ".jsx", ".tsx"],
+            "min_files": 1
+        }
     },
     {
         "name": "Data Processing",
         "category": "Data Engineering",
         "difficulty": "Hard",
         "prompt": "Create a script that generates a dummy CSV file with 1000 rows of sales data (date, product, amount), then reads it using pandas to calculate total sales per product.",
-        "expected_files": ["generate_data.py", "analyze_data.py"]
+        "validation": {
+            "extensions": [".py"],
+            "min_files": 2
+        }
+    },
+    {
+        "name": "Node Express Server",
+        "category": "Backend",
+        "difficulty": "Medium",
+        "prompt": "Create a simple Node.js Express server with a single GET /health endpoint that returns {'status': 'ok'}.",
+        "validation": {
+            "extensions": [".js", ".json"],
+            "min_files": 2
+        }
+    },
+    {
+        "name": "C Hello World",
+        "category": "Systems",
+        "difficulty": "Easy",
+        "prompt": "Create a C program 'hello.c' that prints 'Hello from C' to stdout.",
+        "validation": {
+            "extensions": [".c"],
+            "min_files": 1
+        }
+    },
+    {
+        "name": "C++ Class",
+        "category": "Systems",
+        "difficulty": "Medium",
+        "prompt": "Create a C++ program 'person.cpp' with a Person class. It should have a method to print the person's name. Instantiate it and print 'Hello User'.",
+        "validation": {
+            "extensions": [".cpp"],
+            "min_files": 1
+        }
+    },
+    {
+        "name": "Go Server",
+        "category": "Backend",
+        "difficulty": "Medium",
+        "prompt": "Create a simple Go web server 'main.go' that listens on port 8080 and returns 'Hello from Go' on the root path.",
+        "validation": {
+            "extensions": [".go"],
+            "min_files": 1
+        }
+    },
+    {
+        "name": "Rust Script",
+        "category": "Systems",
+        "difficulty": "Easy",
+        "prompt": "Create a Rust program 'main.rs' that prints 'Hello from Rust' to stdout.",
+        "validation": {
+            "extensions": [".rs"],
+            "min_files": 1
+        }
     }
 ]
 
@@ -93,9 +155,6 @@ class BenchmarkRunner:
             
             # Create Project first
             pm = ProjectManager()
-            # Note: create_project returns a dict, not an object, based on the code I saw
-            # But wait, the docstring says "Returns Created Project object" but the code says "return project_dict"
-            # Let's assume it returns a dict based on line 116: return project_dict
             
             # Also need to handle if project already exists (cleanup from previous run)
             existing = pm.get_project(case['name'])
@@ -114,14 +173,26 @@ class BenchmarkRunner:
                 files = pm.list_files(project_id)
                 files_created = files
                 
-                # Check expected files
-                missing = [f for f in case['expected_files'] if not any(f in created for created in files)]
+                # Validation Logic
+                validation = case.get("validation", {})
+                required_extensions = validation.get("extensions", [])
+                min_files = validation.get("min_files", 0)
                 
-                if not missing:
-                    status = "PASSED"
-                else:
+                # Check 1: Min files
+                if len(files) < min_files:
                     status = "PARTIAL"
-                    error = f"Missing files: {missing}"
+                    error = f"Expected at least {min_files} files, got {len(files)}"
+                else:
+                    # Check 2: Extensions
+                    found_extensions = {os.path.splitext(f)[1] for f in files}
+                    missing_extensions = [ext for ext in required_extensions if ext not in found_extensions]
+                    
+                    if missing_extensions:
+                        status = "PARTIAL"
+                        error = f"Missing file types: {missing_extensions}"
+                    else:
+                        status = "PASSED"
+
             else:
                 status = "FAILED"
                 error = "Project not created"

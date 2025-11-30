@@ -30,6 +30,10 @@ class PromptService:
             ]
         }}
         Ensure the plan is detailed and covers scaffolding, coding, and verification.
+        CRITICAL: You MUST include a final "verification" phase task.
+        - For Python scripts: Add a task to run the script using 'execution' agent.
+        - For Web Apps: Add a task to run tests or start the server briefly.
+        - The 'details' for execution tasks must include 'file_path' or 'command'.
         IMPORTANT: Return ONLY the JSON object. Do not include any markdown formatting or explanation.
         """
 

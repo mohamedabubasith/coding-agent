@@ -61,19 +61,62 @@ class ExecutionAgent(BaseAgent):
             return f"Command execution failed: {str(e)}"
 
     async def run_code(self, file_path: str) -> str:
-        """Run the code file."""
+        """Run the code file based on extension."""
         try:
             # Security warning: executing arbitrary code is dangerous.
             # In a real system, this should be sandboxed.
+            
+            ext = os.path.splitext(file_path)[1].lower()
+            command = []
+            
+            if ext == ".py":
+                command = ["python3", file_path]
+            elif ext == ".js":
+                command = ["node", file_path]
+            elif ext == ".ts":
+                command = ["ts-node", file_path]
+            elif ext == ".sh":
+                command = ["bash", file_path]
+            elif ext == ".c":
+                # Compile and run
+                exe_path = os.path.splitext(file_path)[0]
+                command = ["sh", "-c", f"gcc {file_path} -o {exe_path} && {exe_path}"]
+            elif ext == ".cpp":
+                # Compile and run
+                exe_path = os.path.splitext(file_path)[0]
+                command = ["sh", "-c", f"g++ {file_path} -o {exe_path} && {exe_path}"]
+            elif ext == ".go":
+                command = ["go", "run", file_path]
+            elif ext == ".rs":
+                # Compile and run
+                exe_path = os.path.splitext(file_path)[0]
+                command = ["sh", "-c", f"rustc {file_path} && {exe_path}"]
+            else:
+                return f"Unsupported file type: {ext}"
+            
             import asyncio
             loop = asyncio.get_event_loop()
             result = await loop.run_in_executor(
                 None,
-                lambda: subprocess.run(["python3", file_path], capture_output=True, text=True, timeout=10)
+                lambda: subprocess.run(command, capture_output=True, text=True, timeout=30)
             )
-            return f"Stdout:\n{result.stdout}\nStderr:\n{result.stderr}"
+            
+            output = ""
+            if result.stdout:
+                output += f"Stdout:\n{result.stdout}\n"
+            if result.stderr:
+                output += f"Stderr:\n{result.stderr}\n"
+                
+            if result.returncode != 0:
+                # Raise exception to trigger ErrorAgent in Orchestrator
+                raise Exception(f"Execution failed with code {result.returncode}:\n{output}")
+                
+            return output
+        except subprocess.TimeoutExpired:
+            raise Exception("Execution timed out after 30 seconds")
         except Exception as e:
-            return f"Execution failed: {str(e)}"
+            # Re-raise to be caught by Orchestrator
+            raise e
 
     def log_execution(self, project_id: str, result: str) -> str:
         """Log execution results."""
