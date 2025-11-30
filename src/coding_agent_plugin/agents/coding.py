@@ -65,26 +65,19 @@ class CodingAgent(BaseAgent):
 
     async def generate_code(self, prompt: str, existing_content: str | None = None, project_files: list[str] = None) -> str:
         """Generate code using LLM."""
-        system_content = """You are an expert coding assistant. Generate clean, production-ready code for the given task.
-IMPORTANT RULES:
-- Return ONLY the code itself
-- Do NOT include any markdown formatting (no ```python or ``` blocks)
-- Do NOT include explanations or comments outside the code
-- Write complete, working code that can be directly executed
-- USE EXISTING FILE PATHS to determine correct imports (e.g. if 'app/auth/routers.py' exists, import from 'app.auth.routers').
-"""
+        from coding_agent_plugin.services.prompt_service import PromptService
         
-        user_content = prompt
+        full_prompt = prompt
         
         if project_files:
-            user_content += f"\n\nProject Structure:\n{', '.join(project_files)}\n"
+            full_prompt += f"\n\nProject Structure:\n{', '.join(project_files)}\n"
             
         if existing_content:
-            user_content += f"\n\nExisting content of the file:\n{existing_content}\n\nPlease update the code based on the request."
+            full_prompt += f"\n\nExisting content of the file:\n{existing_content}\n\nPlease update the code based on the request."
             
         messages = [
-            SystemMessage(content=system_content),
-            HumanMessage(content=user_content)
+            SystemMessage(content=PromptService.get_coding_system_prompt()),
+            HumanMessage(content=full_prompt)
         ]
         
         response = await self.retry_operation(self.model.ainvoke, messages)

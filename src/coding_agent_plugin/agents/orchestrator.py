@@ -6,12 +6,14 @@ from .coding import CodingAgent
 from .task import TaskAgent
 from .error import ErrorAgent
 from .execution import ExecutionAgent
+from coding_agent_plugin.acp.client import InProcessACPClient
 
 
 class OrchestratorAgent:
-    """Agent responsible for orchestrating tasks to other agents."""
+    """Agent responsible for orchestrating tasks to other agents using IBM ACP SDK."""
 
     def __init__(self) -> None:
+        # Initialize all agents
         self.agents = {
             "planning": PlanningAgent(name="planning"),
             "coding": CodingAgent(name="coding"),
@@ -19,6 +21,22 @@ class OrchestratorAgent:
             "error": ErrorAgent(name="error"),
             "execution": ExecutionAgent(name="execution"),
         }
+        
+        # Initialize ACP client for in-process communication
+        # This follows IBM's ACP protocol but keeps agents in-process for performance
+        self.acp_client = InProcessACPClient(self.agents)
+
+    async def send_to_agent(self, agent_name: str, payload: dict) -> dict:
+        """Send a message to an agent using IBM ACP SDK client.
+        
+        Args:
+            agent_name: Name of the agent to invoke
+            payload: The request payload
+            
+        Returns:
+            Agent's response
+        """
+        return await self.acp_client.send_to_agent(agent_name, payload)
 
     async def execute(self, mode: str, user_prompt: str, project_id: str) -> Dict[str, Any]:
         """Execute the task based on the mode."""
@@ -45,7 +63,7 @@ class OrchestratorAgent:
             "user_prompt": user_prompt,
             "project_id": project_id
         }
-        plan_result = await self.agents["planning"].execute(planning_task)
+        plan_result = await self.send_to_agent("planning", planning_task)
         
         workflow = plan_result.get("workflow", {})
         tasks = workflow.get("tasks", [])
@@ -99,9 +117,9 @@ class OrchestratorAgent:
                 try:
                     result = None
                     if agent_type == "coding":
-                        result = await self.agents["coding"].execute(task_input)
+                        result = await self.send_to_agent("coding", task_input)
                     elif agent_type == "execution":
-                        result = await self.agents["execution"].execute(task_input)
+                        result = await self.send_to_agent("execution", task_input)
                     elif agent_type == "task":
                         # TaskAgent is now mostly for tracking, but if plan assigns it work,
                         # we treat it as a generic log or maybe file op if implemented.

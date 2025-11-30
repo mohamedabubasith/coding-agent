@@ -51,8 +51,9 @@ class ErrorAgent(BaseAgent):
 
     async def fix_code(self, code: str, error: str) -> str:
         """Fix code using LLM."""
+        from coding_agent_plugin.services.prompt_service import PromptService
         messages = [
-            SystemMessage(content="You are an error fixing agent. Fix the errors in the provided code. Return ONLY the fixed code."),
+            SystemMessage(content=PromptService.get_error_fixing_system_prompt()),
             HumanMessage(content=f"Code:\n{code}\n\nError:\n{error}")
         ]
         response = await self.model.ainvoke(messages)

@@ -4,10 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agentic-coder"  # Must be unique on PyPI
-version = "0.3.23"
+version = "0.4.0"
 description = "AI-powered autonomous project creator and iterative developer"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [
     { name = "Mohamed Abu Basith", email = "your.email@example.com" }
@@ -42,6 +42,7 @@ dependencies = [
     "psycopg2-binary>=2.9.11",
     "langchain>=1.1.0",
     "langchain-openai>=1.1.0",
+    "acp-sdk>=0.1.0",  # IBM Agent Communication Protocol SDK
 ]
 
 [project.optional-dependencies]

@@ -61,32 +61,8 @@ IMPORTANT GUIDELINES FOR EXISTING PROJECTS:
 5. MAINTAIN consistency in coding style and structure.
 """
         
-        system_prompt = SystemMessage(content=f"""You are a software architect. Create a comprehensive plan for the user's request.
-        {files_context}
-        Return a JSON object with the following structure:
-        {{
-            "architecture": {{
-                "component_name": ["file1", "file2"]
-            }},
-            "tasks": [
-                {{
-                    "id": 1,
-                    "phase": "scaffold|coding|verification",
-                    "description": "Task description",
-                    "agent": "task|coding|execution",
-                    "details": {{
-                        "action": "create_dirs", 
-                        "paths": ["dir1"],
-                        "file_path": "path/to/file",
-                        "prompt": "Instructions for coding agent",
-                        "command": "Shell command for execution agent"
-                    }}
-                }}
-            ]
-        }}
-        Ensure the plan is detailed and covers scaffolding, coding, and verification.
-        IMPORTANT: Return ONLY the JSON object. Do not include any markdown formatting or explanation.
-        """)
+        from coding_agent_plugin.services.prompt_service import PromptService
+        system_prompt = SystemMessage(content=PromptService.get_planning_system_prompt(files_context))
         input_prompt = HumanMessage(content=f"Request: {user_input}")
         
         messages = [system_prompt, input_prompt]
