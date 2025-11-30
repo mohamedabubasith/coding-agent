@@ -9,6 +9,15 @@
 </p>
 
 <p align="center">
+  <a href="https://pypi.org/project/agentic-coder/">
+    <img src="https://img.shields.io/pypi/v/agentic-coder?color=blue&style=for-the-badge" alt="PyPI version"/>
+  </a>
+  <a href="https://github.com/mohamedabubasith/coding-agent/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/mohamedabubasith/coding-agent?style=for-the-badge" alt="License"/>
+  </a>
+</p>
+
+<p align="center">
   <strong>Your AI-Powered Project Creator & Iterative Developer</strong>
 </p>
 
